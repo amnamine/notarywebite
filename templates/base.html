@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="{{ curr_lang }}" dir="{{ dir }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}أدوات مكتب بوخاري مريم{% endblock %}</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+  <header class="band gutter">
+    <div class="band-in">
+      <svg class="seal" viewBox="0 0 46 46" aria-hidden="true">
+        <circle cx="23" cy="23" r="21.5" stroke-width="1.2"/>
+        <circle cx="23" cy="23" r="17.5" stroke-width=".8"/>
+        <text x="23" y="29" text-anchor="middle" font-size="17">ب.م</text>
+      </svg>
+      <div class="office">
+        <b>مكتب الأستاذ بوخاري مريم</b>
+        <span>موثق — الجزائر</span>
+      </div>
+      <div class="nav-actions">
+        {% if current_user.is_authenticated %}
+          {% if current_user.is_admin %}
+            <a href="{{ url_for('routes.admin_users') }}" class="tag" style="text-decoration:none;">المستخدمين</a>
+            <a href="{{ url_for('routes.admin_logs') }}" class="tag" style="text-decoration:none;">سجل العمليات</a>
+          {% endif %}
+          <a href="{{ url_for('routes.logout') }}" class="tag" style="text-decoration:none;">خروج ({{ current_user.username }})</a>
+        {% endif %}
+        <div class="lang-switcher">
+          <a href="{{ url_for('routes.set_locale', lang='ar') }}" class="{% if curr_lang == 'ar' %}active{% endif %}">ع</a>
+          <a href="{{ url_for('routes.set_locale', lang='fr') }}" class="{% if curr_lang == 'fr' %}active{% endif %}">FR</a>
+          <a href="{{ url_for('routes.set_locale', lang='en') }}" class="{% if curr_lang == 'en' %}active{% endif %}">EN</a>
+        </div>
+        <button id="themeToggle" class="theme-btn" title="تغيير المظهر">🌓</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap gutter">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div style="display:grid; gap:8px;">
+          {% for category, msg in messages %}
+            <p class="msg {{ category }}">{{ msg }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  <footer class="gutter" style="text-align:center; padding-block: 20px; color:var(--muted); font-size:13px;">
+    أداة داخلية لمكتب التوثيق — مكتب الأستاذ بوخاري مريم © 2026
+  </footer>
+
+  <script>
+    // Theme toggler
+    const btn = document.getElementById('themeToggle');
+    btn.addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme') || 'auto';
+      const nxt = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', nxt);
+      localStorage.setItem('edd_theme', nxt);
+    });
+    const savedTheme = localStorage.getItem('edd_theme');
+    if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

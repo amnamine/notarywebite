@@ -1,0 +1,133 @@
+<div dir="rtl" lang="ar">
+<div class="band gutter">
+  <div class="band-in">
+    <svg class="seal" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="21.5" stroke-width="1.2"/><circle cx="23" cy="23" r="17.5" stroke-width=".8"/><text x="23" y="29" text-anchor="middle" font-size="17">ج.م</text></svg>
+    <div class="office"><b>مكتب الأستاذة جباري مريم</b><span>موثقة — اسطاوالي، الجزائر</span></div>
+    <span class="tag">استعمال داخلي</span>
+  </div>
+</div>
+
+<div class="gate gutter" id="gate">
+  <div class="gate-in">
+    <form class="sheet gatebox" id="gateForm" autocomplete="off">
+      <h1>أدوات تحضير العقود</h1>
+      <p>هذه الأداة خاصة بالمكتب. أدخلي الرمز للمتابعة.</p>
+      <label for="code">الرمز<input type="password" id="code" inputmode="numeric" autocomplete="off"></label>
+      <button type="submit" id="codeBtn">دخول</button>
+      <p class="msg warn" id="codeErr" hidden></p>
+    </form>
+  </div>
+</div>
+
+<div id="app" hidden>
+<main class="wrap gutter">
+  <section class="intro">
+    <h1>أدوات تحضير العقود</h1>
+    <p>اختاري نوع العمل، ثم اتبعي الخطوات. الكلمات والأرقام في ملفاتك لا تتغير، يتغيّر الشكل فقط.</p>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="نوع العمل">
+    <button class="tab" role="tab" id="tabTpl" aria-controls="panelTpl" aria-selected="true">
+      <span class="t">إجــراء إشهار عقاري</span>
+      <span class="d">وضع عقد مكتوب (Word) داخل الإطار الرسمي</span>
+    </button>
+    <button class="tab" role="tab" id="tab556" aria-controls="panel556" aria-selected="false">
+      <span class="t">عقـــد جــدول الوصفـي للتقسيـم</span>
+      <span class="d">كتابة الجداول الممسوحة (PDF) كجداول Word</span>
+    </button>
+  </div>
+
+  <!-- إجراء إشهار عقاري -->
+  <section class="sheet" id="panelTpl" role="tabpanel" aria-labelledby="tabTpl">
+    <ol class="proc">
+      <li><span class="num">1</span><div class="body">
+        <h2>ملف العقد</h2>
+        <label class="drop" id="drop" for="inp">
+          <input type="file" id="inp" accept=".docx">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg>
+          <strong>اسحبي ملف Word هنا أو اضغطي للاختيار</strong>
+          <span>صيغة <span class="ltr">.docx</span> فقط</span>
+        </label>
+        <p class="msg warn" id="err" hidden></p>
+        <div id="loaded" hidden><div class="file" id="fname"></div><div class="stats" id="stats"></div></div>
+      </div></li>
+      <li><span class="num">2</span><div class="body">
+        <h2>مراجع مسح الأراضي</h2>
+        <p class="hint" id="detHint">تُملأ تلقائياً من نص الملف. تأكدي منها قبل الإنشاء.</p>
+        <div class="fields">
+          <label for="fQism">قسم<input type="text" id="fQism" placeholder="مثال: 27"></label>
+          <label for="fBal">بلدية<input type="text" id="fBal" placeholder="مثال: وادي العنب"></label>
+          <label for="fMaj">مجموعة ملكية رقم<input type="text" id="fMaj" placeholder="مثال: 155"></label>
+          <label for="fHissa">حصة رقم<input type="text" id="fHissa" placeholder="فارغة إن لم توجد"></label>
+          <label for="fWil">الحفظ العقاري لولاية<input type="text" id="fWil" placeholder="نقاط إن لم تُعرف"></label>
+        </div>
+      </div></li>
+      <li><span class="num">3</span><div class="body">
+        <h2>الإيداع والرسم</h2>
+        <p class="hint">اختياري. ما تتركينه فارغاً يبقى نقاطاً «......» في الملف لتُكتب باليد.</p>
+        <div class="fields">
+          <label for="fIdaHajm">إيداع — حجم<input type="text" id="fIdaHajm"></label>
+          <label for="fIdaRaqm">إيداع — رقم<input type="text" id="fIdaRaqm"></label>
+          <label for="fFi">في<input type="text" id="fFi"></label>
+          <label for="fMujallad">مجلد<input type="text" id="fMujallad"></label>
+          <label for="fMujRaqm">رقم (المجلد)<input type="text" id="fMujRaqm"></label>
+          <label for="fRasm">رسم<input type="text" id="fRasm"></label>
+        </div>
+      </div></li>
+      <li><span class="num">4</span><div class="body">
+        <h2>الإنشاء والتحميل</h2>
+        <div class="btns"><button id="go" disabled>إنشاء الملف</button></div>
+        <p class="msg ok" id="done" hidden></p>
+        <div class="btns" id="dl" hidden><button class="ghost" id="dlTpl">تحميل «إجــراء إشهار عقاري»</button></div>
+        <p class="msg warn" id="dlErr" hidden></p>
+      </div></li>
+    </ol>
+    <details>
+      <summary>ما الذي يفعله؟</summary>
+      <ul class="rules">
+        <li>الترويسة، إطار الإيداع والرسم، مراجع مسح الأراضي، والعقد في العمود العريض مع «إطار مخصص للمحافظ العقاري»، والإطار ينزل حتى أسفل كل صفحة، وأرقام الصفحات.</li>
+        <li>الجداول تبقى كما هي في ملفك. إذا كان الجدول أعرض من الإطار يصغر كله بنفس النسبة.</li>
+        <li>حذف الأسطر الفارغة، والخطوط «-----» حتى آخر السطر في نهاية الفقرات (لا العناوين)، والأرقام مثل <span class="ltr">91/148</span> كما كُتبت.</li>
+        <li>ملف <span class="ltr">.doc</span> القديم: افتحيه في Word واحفظيه باسم <span class="ltr">.docx</span>.</li>
+      </ul>
+    </details>
+    <div class="note"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span><b>يبقى الملف في جهازك.</b> لا يُرسل إلى أي مكان ولا يُحفظ في الموقع.</span></div>
+  </section>
+
+  <!-- عقد جدول الوصفي للتقسيم -->
+  <section class="sheet" id="panel556" role="tabpanel" aria-labelledby="tab556" hidden>
+    <ol class="proc">
+      <li><span class="num">1</span><div class="body">
+        <h2>ملف الجداول الممسوحة</h2>
+        <label class="drop" id="drop556" for="inp556">
+          <input type="file" id="inp556" accept=".pdf,.docx">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg>
+          <strong>اسحبي ملف PDF الممسوح هنا أو اضغطي للاختيار</strong>
+          <span>الأفضل PDF مباشرة من CamScanner، بدون تحويله إلى Word</span>
+        </label>
+        <div class="file" id="fname556" hidden></div>
+        <div class="stats" id="imgStats"></div>
+      </div></li>
+      <li><span class="num">2</span><div class="body">
+        <h2>القراءة</h2>
+        <p class="hint">يقرأ Claude كل صفحة ويكتب الجدول كجدول Word بنفس شكله: العناوين، الخانات المدمجة، م²، وأسطر المجموع. كل صفحة تأخذ دقيقة إلى دقيقتين.</p>
+        <div class="btns">
+          <button id="go556" disabled>بدء القراءة</button>
+          <button class="ghost" id="stop556" hidden>إيقاف</button>
+        </div>
+        <p class="prog" id="prog556" hidden></p>
+        <p class="msg warn" id="err556" hidden></p>
+      </div></li>
+      <li><span class="num">3</span><div class="body">
+        <h2>المراجعة والتحميل</h2>
+        <p class="hint">الخانات غير الواضحة تُلوَّن بالأصفر، وكل جدول يُقارن بأسطر المجموع. راجعي ما عليه ⚠ قبل الاستعمال.</p>
+        <ul class="rules" id="rep556" hidden></ul>
+        <div class="btns" id="dl556wrap" hidden><button class="ghost" id="dl556">تحميل «عقـــد جــدول الوصفـي للتقسيـم»</button></div>
+      </div></li>
+    </ol>
+    <div class="note"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span><b>القراءة تستعمل حساب Claude الخاص بكِ.</b> صور الصفحات تُرسل إلى Claude لقراءتها فقط، ولا يحفظ الموقع أي ملف.</span></div>
+  </section>
+</main>
+<footer class="gutter">أداة داخلية لمكتب التوثيق — الملفات لا تُحفظ في الموقع</footer>
+</div>
+</div>

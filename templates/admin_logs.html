@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}سجل العمليات — مكتب التوثيق{% endblock %}
+
+{% block content %}
+<section class="sheet" style="padding: 24px;">
+  <h2 style="margin-top:0;">سجل عمليات تحضير العقود (Activity Log)</h2>
+  <p class="hint" style="margin-bottom:16px;">ملاحظة: السجل يحتفظ فقط بأسماء الملفات وعدد الصفحات/التحذيرات، ولا يخزن أي محتوى ملفات لضمان السرية التامة.</p>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>المستخدم</th>
+        <th>الأداة</th>
+        <th>اسم الملف الأصلي</th>
+        <th>الصفحات / الجداول</th>
+        <th>التنبيهات ⚠</th>
+        <th>التوقيت</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in logs %}
+      <tr>
+        <td><b>{{ l.username }}</b></td>
+        <td>{{ l.tool_name }}</td>
+        <td class="file">{{ l.original_filename }}</td>
+        <td>{{ l.pages_count }} فقرة/صفحة | {{ l.tables_count }} جدول</td>
+        <td>
+          {% if l.warnings_count > 0 %}
+            <span class="chip" style="background:var(--warn-soft); color:var(--warn);">⚠ {{ l.warnings_count }} تنبيه</span>
+          {% else %}
+            <span class="chip" style="background:var(--ok-soft); color:var(--ok);">سليم</span>
+          {% endif %}
+        </td>
+        <td class="ltr">{{ l.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="6" style="text-align:center; color:var(--muted); padding:24px;">لا توجد عمليات مسجلة بعد.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

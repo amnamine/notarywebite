@@ -1,0 +1,12 @@
+flask
+flask-login
+flask-wtf
+flask-babel
+flask-sqlalchemy
+python-dotenv
+lxml
+Pillow
+PyMuPDF
+anthropic
+pytest
+gunicorn

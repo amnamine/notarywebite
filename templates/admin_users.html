@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}إدارة المستخدمين — مكتب التوثيق{% endblock %}
+
+{% block content %}
+<section class="sheet" style="padding: 24px;">
+  <h2 style="margin-top:0;">إدارة مستخدمي المكتب</h2>
+  
+  <form method="POST" style="margin-bottom: 24px; display:grid; gap:12px; background:var(--paper); padding:16px; border-radius:8px;">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+    <input type="hidden" name="action" value="create"/>
+    <h3 style="margin:0; font-size:16px;">إضافة موظف جديد</h3>
+    <div class="fields">
+      <label>اسم المستخدم<input type="text" name="username" required></label>
+      <label>كلمة المرور<input type="password" name="password" required></label>
+      <label>الدور
+        <select name="role">
+          <option value="staff">موظف (Staff)</option>
+          <option value="admin">مسؤول (Admin)</option>
+        </select>
+      </label>
+    </div>
+    <button type="submit" style="width:fit-content;">إنشاء الحساب</button>
+  </form>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>اسم المستخدم</th>
+        <th>الدور</th>
+        <th>الحالة</th>
+        <th>تاريخ الإنشاء</th>
+        <th>إجراءات</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td><b>{{ u.username }}</b></td>
+        <td>{{ 'مسؤول' if u.role == 'admin' else 'موظف' }}</td>
+        <td>
+          <span class="chip" style="{{ 'background:var(--ok-soft);color:var(--ok)' if u.is_active_account else 'background:var(--warn-soft);color:var(--warn)' }}">
+            {{ 'مفعل' if u.is_active_account else 'معطل' }}
+          </span>
+        </td>
+        <td class="ltr">{{ u.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>
+          {% if u.id != current_user.id %}
+          <form method="POST" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="hidden" name="action" value="toggle"/>
+            <input type="hidden" name="user_id" value="{{ u.id }}"/>
+            <button type="submit" class="ghost" style="padding:4px 8px; font-size:12px;">
+              {{ 'تعطيل' if u.is_active_account else 'تفعيل' }}
+            </button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

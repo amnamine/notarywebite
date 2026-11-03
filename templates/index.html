@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}أدوات تحضير العقود — مكتب الأستاذ بوخاري مريم{% endblock %}
+
+{% block content %}
+<section class="intro">
+  <h1>إجــراء إشهار عقاري</h1>
+  <p>وضع عقد مكتوب (Word) داخل الإطار الرسمي. الكلمات والأرقام في ملفك لا تتغير، يتغيّر الشكل فقط.</p>
+</section>
+
+<!-- TOOL A: إجــراء إشهار عقاري -->
+<section class="sheet" id="panelTpl" role="region">
+  <ol class="proc">
+    <li>
+      <span class="num">1</span>
+      <div class="body">
+        <h2>ملف العقد</h2>
+        <label class="drop" id="dropA" for="inpA">
+          <input type="file" id="inpA" accept=".docx">
+          <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg>
+          <strong>اسحب ملف Word هنا أو اضغط للاختيار</strong>
+          <span>صيغة .docx فقط</span>
+        </label>
+        <p class="msg warn" id="errA" hidden></p>
+        <div id="loadedA" hidden>
+          <div class="file" id="fnameA"></div>
+          <div class="stats" id="statsA"></div>
+        </div>
+      </div>
+    </li>
+    <li>
+      <span class="num">2</span>
+      <div class="body">
+        <h2>مراجع مسح الأراضي</h2>
+        <p class="hint">تُملأ تلقائياً من نص الملف. تأكد منها قبل الإنشاء.</p>
+        <div class="fields">
+          <label>قسم<input type="text" id="fQism" placeholder="مثال: 27"></label>
+          <label>بلدية<input type="text" id="fBal" placeholder="مثال: وادي العنب"></label>
+          <label>مجموعة ملكية رقم<input type="text" id="fMaj" placeholder="مثال: 155"></label>
+          <label>حصة رقم<input type="text" id="fHissa" placeholder="فارغة إن لم توجد"></label>
+          <label>الحفظ العقاري لولاية<input type="text" id="fWil" placeholder="نقاط إن لم تُعرف"></label>
+        </div>
+      </div>
+    </li>
+    <li>
+      <span class="num">3</span>
+      <div class="body">
+        <h2>الإيداع والرسم</h2>
+        <p class="hint">اختياري. ما تتركه فارغاً يبقى نقاطاً «......» في الملف لتُكتب باليد.</p>
+        <div class="fields">
+          <label>إيداع — حجم<input type="text" id="fIdaHajm"></label>
+          <label>إيداع — رقم<input type="text" id="fIdaRaqm"></label>
+          <label>في<input type="text" id="fFi"></label>
+          <label>مجلد<input type="text" id="fMujallad"></label>
+          <label>رقم (المجلد)<input type="text" id="fMujRaqm"></label>
+          <label>رسم<input type="text" id="fRasm"></label>
+        </div>
+      </div>
+    </li>
+    <li>
+      <span class="num">4</span>
+      <div class="body">
+        <h2>الإنشاء والتحميل</h2>
+        <div class="btns">
+          <button id="btnGoA" disabled>إنشاء الملف</button>
+        </div>
+        <p class="msg ok" id="doneA" hidden></p>
+        <p class="msg warn" id="dlErrA" hidden></p>
+      </div>
+    </li>
+  </ol>
+  <div class="note">
+    <svg class="ico" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+    <span><b>يبقى الملف في جهازك.</b> الملف لا يُحفظ في الموقع.</span>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

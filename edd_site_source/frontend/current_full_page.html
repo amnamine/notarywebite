@@ -1,0 +1,1386 @@
+<title>أدوات مكتب جباري مريم</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: an office register — ink band with the office seal, two tools as tabs, each tool a numbered procedure on one sheet. */
+:root{
+  --paper:#f3f4f6; --sheet:#ffffff; --ink:#151c2b; --muted:#5d6676; --line:#dfe3ea; --line-strong:#c9cfd9;
+  --band:#16213a; --band-ink:#eef1f7; --band-muted:#a9b3c7;
+  --accent:#0e6b62; --accent-ink:#ffffff; --accent-soft:#e2f0ee;
+  --warn:#8f5400; --warn-soft:#fbf0dc; --ok:#1b6a3a; --ok-soft:#e3f2e8;
+  --display:"Amiri","Traditional Arabic","Times New Roman",serif;
+  --body:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f131a; --sheet:#171c25; --ink:#e8ebf1; --muted:#9aa3b3; --line:#283040; --line-strong:#364055;
+  --band:#0b1222; --band-ink:#eef1f7; --band-muted:#8f9ab0;
+  --accent:#4fb3a6; --accent-ink:#06201c; --accent-soft:#16302d;
+  --warn:#e8b45a; --warn-soft:#33281a; --ok:#6fcf91; --ok-soft:#16301f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f131a; --sheet:#171c25; --ink:#e8ebf1; --muted:#9aa3b3; --line:#283040; --line-strong:#364055;
+  --band:#0b1222; --band-ink:#eef1f7; --band-muted:#8f9ab0;
+  --accent:#4fb3a6; --accent-ink:#06201c; --accent-soft:#16302d;
+  --warn:#e8b45a; --warn-soft:#33281a; --ok:#6fcf91; --ok-soft:#16301f; color-scheme:dark}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7;margin:0}
+.gutter{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* band */
+.band{background:var(--band);color:var(--band-ink)}
+.band-in{max-width:880px;margin:0 auto;padding-block:18px;display:flex;align-items:center;gap:14px}
+.seal{flex:none;width:46px;height:46px}
+.seal circle{fill:none;stroke:var(--band-ink)}
+.seal text{fill:var(--band-ink);font-family:var(--display);font-weight:700}
+.office{display:grid;line-height:1.35;min-width:0}
+.office b{font-family:var(--display);font-size:20px;font-weight:700}
+.office span{font-size:13px;color:var(--band-muted)}
+.tag{margin-inline-start:auto;font-size:12px;color:var(--band-muted);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:3px 12px;white-space:nowrap}
+
+/* page */
+.wrap{max-width:880px;margin:0 auto;padding-block:30px 56px;display:grid;gap:22px}
+.intro h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,5vw,40px);line-height:1.2;margin:0;text-wrap:balance}
+.intro p{margin:6px 0 0;color:var(--muted);max-width:64ch}
+
+/* tabs */
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tab{all:unset;cursor:pointer;display:grid;gap:4px;padding:16px 18px;border-radius:var(--r);background:var(--sheet);border:1px solid var(--line);position:relative;min-width:0}
+.tab:hover{border-color:var(--line-strong)}
+.tab:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tab .t{font-family:var(--display);font-weight:700;font-size:21px;line-height:1.3}
+.tab .d{font-size:13.5px;color:var(--muted)}
+.tab[aria-selected="true"]{border-color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent)}
+.tab[aria-selected="true"] .t{color:var(--accent)}
+@media (max-width:560px){.tabs{grid-template-columns:1fr}}
+
+/* sheet + procedure */
+.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:var(--r);min-width:0}
+.proc{list-style:none;margin:0;padding:6px 0}
+.proc>li{display:grid;grid-template-columns:36px 1fr;gap:16px;padding:20px 22px;border-top:1px solid var(--line)}
+.proc>li:first-child{border-top:0}
+.num{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:14px;color:var(--accent);border:1.5px solid var(--accent);margin-top:2px}
+.body{display:grid;gap:12px;min-width:0}
+.body h2{margin:0;font-size:17.5px;font-weight:600;line-height:1.4}
+.hint{margin:0;font-size:14px;color:var(--muted)}
+
+/* drop zone */
+.drop{position:relative;border:1.5px dashed var(--line-strong);border-radius:var(--r);padding:26px 16px;text-align:center;display:grid;gap:6px;justify-items:center;cursor:pointer;background:var(--paper);transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+.drop svg{width:30px;height:30px;stroke:var(--accent);fill:none;stroke-width:1.6}
+.drop strong{font-size:16px;font-weight:600}
+.drop span{color:var(--muted);font-size:13.5px}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.file{font-family:var(--mono);font-size:13.5px;direction:ltr;unicode-bidi:isolate;word-break:break-all;color:var(--ink)}
+.stats{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:2px 12px;font-size:13.5px;font-variant-numeric:tabular-nums}
+
+/* fields */
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+label{display:grid;gap:5px;font-size:13.5px;color:var(--muted);font-weight:500}
+input[type=text],input[type=password]{font:inherit;font-size:16px;color:var(--ink);background:var(--paper);border:1px solid var(--line-strong);border-radius:8px;padding:9px 12px;min-width:0;width:100%}
+input[type=text]:focus,input[type=password]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+
+/* buttons + messages */
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+button{font:inherit;font-weight:600;font-size:15.5px;border-radius:8px;padding:11px 22px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
+button:hover:not(:disabled){filter:brightness(1.08)}
+button.ghost{background:transparent;color:var(--accent)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.msg{border-radius:8px;padding:11px 14px;font-size:14.5px;margin:0}
+.msg.warn{background:var(--warn-soft);color:var(--warn)}
+.msg.ok{background:var(--ok-soft);color:var(--ok)}
+.prog{margin:0;font-size:14.5px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.rules{margin:0;padding-inline-start:20px;display:grid;gap:5px;color:var(--muted);font-size:14.5px}
+.rules li::marker{color:var(--accent)}
+.note{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--muted);padding:14px 22px;border-top:1px solid var(--line);background:var(--paper);border-radius:0 0 var(--r) var(--r)}
+.note .ico{flex:none;width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:1.8;margin-top:2px}
+.note b{color:var(--ink);font-weight:600}
+details{padding:16px 22px}
+details summary{cursor:pointer;font-weight:600;font-size:15px}
+details[open] summary{margin-bottom:10px}
+.ltr{direction:ltr;unicode-bidi:isolate;font-family:var(--mono);font-size:13.5px}
+footer{max-width:880px;margin:0 auto;padding-block:0 40px;font-size:12.5px;color:var(--muted);text-align:center}
+
+/* entry code */
+.gate{min-height:100%;display:grid;align-content:start}
+.gate-in{max-width:400px;width:100%;margin:56px auto 0}
+.gatebox{display:grid;gap:16px;padding:26px}
+.gatebox h1{font-family:var(--display);font-weight:700;font-size:28px;margin:0}
+.gatebox p{margin:-8px 0 0;color:var(--muted);font-size:14px}
+input[type=password]{font-size:24px;letter-spacing:.35em;text-align:center;direction:ltr}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div dir="rtl" lang="ar">
+<div class="band gutter">
+  <div class="band-in">
+    <svg class="seal" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="21.5" stroke-width="1.2"/><circle cx="23" cy="23" r="17.5" stroke-width=".8"/><text x="23" y="29" text-anchor="middle" font-size="17">ج.م</text></svg>
+    <div class="office"><b>مكتب الأستاذة جباري مريم</b><span>موثقة — اسطاوالي، الجزائر</span></div>
+    <span class="tag">استعمال داخلي</span>
+  </div>
+</div>
+
+<div class="gate gutter" id="gate">
+  <div class="gate-in">
+    <form class="sheet gatebox" id="gateForm" autocomplete="off">
+      <h1>أدوات تحضير العقود</h1>
+      <p>هذه الأداة خاصة بالمكتب. أدخلي الرمز للمتابعة.</p>
+      <label for="code">الرمز<input type="password" id="code" inputmode="numeric" autocomplete="off"></label>
+      <button type="submit" id="codeBtn">دخول</button>
+      <p class="msg warn" id="codeErr" hidden></p>
+    </form>
+  </div>
+</div>
+
+<div id="app" hidden>
+<main class="wrap gutter">
+  <section class="intro">
+    <h1>أدوات تحضير العقود</h1>
+    <p>اختاري نوع العمل، ثم اتبعي الخطوات. الكلمات والأرقام في ملفاتك لا تتغير، يتغيّر الشكل فقط.</p>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="نوع العمل">
+    <button class="tab" role="tab" id="tabTpl" aria-controls="panelTpl" aria-selected="true">
+      <span class="t">إجــراء إشهار عقاري</span>
+      <span class="d">وضع عقد مكتوب (Word) داخل الإطار الرسمي</span>
+    </button>
+    <button class="tab" role="tab" id="tab556" aria-controls="panel556" aria-selected="false">
+      <span class="t">عقـــد جــدول الوصفـي للتقسيـم</span>
+      <span class="d">كتابة الجداول الممسوحة (PDF) كجداول Word</span>
+    </button>
+  </div>
+
+  <!-- إجراء إشهار عقاري -->
+  <section class="sheet" id="panelTpl" role="tabpanel" aria-labelledby="tabTpl">
+    <ol class="proc">
+      <li><span class="num">1</span><div class="body">
+        <h2>ملف العقد</h2>
+        <label class="drop" id="drop" for="inp">
+          <input type="file" id="inp" accept=".docx">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg>
+          <strong>اسحبي ملف Word هنا أو اضغطي للاختيار</strong>
+          <span>صيغة <span class="ltr">.docx</span> فقط</span>
+        </label>
+        <p class="msg warn" id="err" hidden></p>
+        <div id="loaded" hidden><div class="file" id="fname"></div><div class="stats" id="stats"></div></div>
+      </div></li>
+      <li><span class="num">2</span><div class="body">
+        <h2>مراجع مسح الأراضي</h2>
+        <p class="hint" id="detHint">تُملأ تلقائياً من نص الملف. تأكدي منها قبل الإنشاء.</p>
+        <div class="fields">
+          <label for="fQism">قسم<input type="text" id="fQism" placeholder="مثال: 27"></label>
+          <label for="fBal">بلدية<input type="text" id="fBal" placeholder="مثال: وادي العنب"></label>
+          <label for="fMaj">مجموعة ملكية رقم<input type="text" id="fMaj" placeholder="مثال: 155"></label>
+          <label for="fHissa">حصة رقم<input type="text" id="fHissa" placeholder="فارغة إن لم توجد"></label>
+          <label for="fWil">الحفظ العقاري لولاية<input type="text" id="fWil" placeholder="نقاط إن لم تُعرف"></label>
+        </div>
+      </div></li>
+      <li><span class="num">3</span><div class="body">
+        <h2>الإيداع والرسم</h2>
+        <p class="hint">اختياري. ما تتركينه فارغاً يبقى نقاطاً «......» في الملف لتُكتب باليد.</p>
+        <div class="fields">
+          <label for="fIdaHajm">إيداع — حجم<input type="text" id="fIdaHajm"></label>
+          <label for="fIdaRaqm">إيداع — رقم<input type="text" id="fIdaRaqm"></label>
+          <label for="fFi">في<input type="text" id="fFi"></label>
+          <label for="fMujallad">مجلد<input type="text" id="fMujallad"></label>
+          <label for="fMujRaqm">رقم (المجلد)<input type="text" id="fMujRaqm"></label>
+          <label for="fRasm">رسم<input type="text" id="fRasm"></label>
+        </div>
+      </div></li>
+      <li><span class="num">4</span><div class="body">
+        <h2>الإنشاء والتحميل</h2>
+        <div class="btns"><button id="go" disabled>إنشاء الملف</button></div>
+        <p class="msg ok" id="done" hidden></p>
+        <div class="btns" id="dl" hidden><button class="ghost" id="dlTpl">تحميل «إجــراء إشهار عقاري»</button></div>
+        <p class="msg warn" id="dlErr" hidden></p>
+      </div></li>
+    </ol>
+    <details>
+      <summary>ما الذي يفعله؟</summary>
+      <ul class="rules">
+        <li>الترويسة، إطار الإيداع والرسم، مراجع مسح الأراضي، والعقد في العمود العريض مع «إطار مخصص للمحافظ العقاري»، والإطار ينزل حتى أسفل كل صفحة، وأرقام الصفحات.</li>
+        <li>الجداول تبقى كما هي في ملفك. إذا كان الجدول أعرض من الإطار يصغر كله بنفس النسبة.</li>
+        <li>حذف الأسطر الفارغة، والخطوط «-----» حتى آخر السطر في نهاية الفقرات (لا العناوين)، والأرقام مثل <span class="ltr">91/148</span> كما كُتبت.</li>
+        <li>ملف <span class="ltr">.doc</span> القديم: افتحيه في Word واحفظيه باسم <span class="ltr">.docx</span>.</li>
+      </ul>
+    </details>
+    <div class="note"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span><b>يبقى الملف في جهازك.</b> لا يُرسل إلى أي مكان ولا يُحفظ في الموقع.</span></div>
+  </section>
+
+  <!-- عقد جدول الوصفي للتقسيم -->
+  <section class="sheet" id="panel556" role="tabpanel" aria-labelledby="tab556" hidden>
+    <ol class="proc">
+      <li><span class="num">1</span><div class="body">
+        <h2>ملف الجداول الممسوحة</h2>
+        <label class="drop" id="drop556" for="inp556">
+          <input type="file" id="inp556" accept=".pdf,.docx">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 18v-6M9 15l3-3 3 3"/></svg>
+          <strong>اسحبي ملف PDF الممسوح هنا أو اضغطي للاختيار</strong>
+          <span>الأفضل PDF مباشرة من CamScanner، بدون تحويله إلى Word</span>
+        </label>
+        <div class="file" id="fname556" hidden></div>
+        <div class="stats" id="imgStats"></div>
+      </div></li>
+      <li><span class="num">2</span><div class="body">
+        <h2>القراءة</h2>
+        <p class="hint">يقرأ Claude كل صفحة ويكتب الجدول كجدول Word بنفس شكله: العناوين، الخانات المدمجة، م²، وأسطر المجموع. كل صفحة تأخذ دقيقة إلى دقيقتين.</p>
+        <div class="btns">
+          <button id="go556" disabled>بدء القراءة</button>
+          <button class="ghost" id="stop556" hidden>إيقاف</button>
+        </div>
+        <p class="prog" id="prog556" hidden></p>
+        <p class="msg warn" id="err556" hidden></p>
+      </div></li>
+      <li><span class="num">3</span><div class="body">
+        <h2>المراجعة والتحميل</h2>
+        <p class="hint">الخانات غير الواضحة تُلوَّن بالأصفر، وكل جدول يُقارن بأسطر المجموع. راجعي ما عليه ⚠ قبل الاستعمال.</p>
+        <ul class="rules" id="rep556" hidden></ul>
+        <div class="btns" id="dl556wrap" hidden><button class="ghost" id="dl556">تحميل «عقـــد جــدول الوصفـي للتقسيـم»</button></div>
+      </div></li>
+    </ol>
+    <div class="note"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span><b>القراءة تستعمل حساب Claude الخاص بكِ.</b> صور الصفحات تُرسل إلى Claude لقراءتها فقط، ولا يحفظ الموقع أي ملف.</span></div>
+  </section>
+</main>
+<footer class="gutter">أداة داخلية لمكتب التوثيق — الملفات لا تُحفظ في الموقع</footer>
+</div>
+</div>
+<script type="application/json" id="shells">{"tpl": {"[Content_Types].xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default ContentType=\"image/png\" Extension=\"png\"/><Default ContentType=\"image/jpeg\" Extension=\"jpeg\"/><Default ContentType=\"image/jpeg\" Extension=\"jpg\"/><Default ContentType=\"image/bmp\" Extension=\"bmp\"/><Default ContentType=\"image/gif\" Extension=\"gif\"/><Default ContentType=\"image/svg+xml\" Extension=\"svg\"/><Default ContentType=\"application/vnd.openxmlformats-package.relationships+xml\" Extension=\"rels\"/><Default ContentType=\"application/xml\" Extension=\"xml\"/><Default ContentType=\"application/vnd.openxmlformats-officedocument.obfuscatedFont\" Extension=\"odttf\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\" PartName=\"/word/document.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\" PartName=\"/word/styles.xml\"/><Override ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\" PartName=\"/docProps/core.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.custom-properties+xml\" PartName=\"/docProps/custom.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\" PartName=\"/docProps/app.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml\" PartName=\"/word/numbering.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml\" PartName=\"/word/footnotes.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml\" PartName=\"/word/endnotes.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml\" PartName=\"/word/settings.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml\" PartName=\"/word/comments.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml\" PartName=\"/word/fontTable.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml\" PartName=\"/word/footer1.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml\" PartName=\"/word/header1.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml\" PartName=\"/word/header2.xml\"/><\/Types>", "word/header1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:hdr xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\"><w:p><w:pPr><w:spacing w:before=\"0\" w:after=\"0\" w:line=\"20\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/><\/w:rPr><\/w:pPr><w:r><w:pict><v:line id=\"edd_box_1\" o:spid=\"_x0000_s2001\" style=\"position:absolute;z-index:-251650000;mso-position-horizontal-relative:page;mso-position-vertical-relative:page\" from=\"55.2pt,30.0pt\" to=\"55.2pt,816.8pt\" strokecolor=\"black\" strokeweight=\".75pt\"><w10:anchorlock/><\/v:line><\/w:pict><\/w:r><w:r><w:pict><v:line id=\"edd_box_2\" o:spid=\"_x0000_s2002\" style=\"position:absolute;z-index:-251650000;mso-position-horizontal-relative:page;mso-position-vertical-relative:page\" from=\"402.2pt,30.0pt\" to=\"402.2pt,816.8pt\" strokecolor=\"black\" strokeweight=\".75pt\"><w10:anchorlock/><\/v:line><\/w:pict><\/w:r><w:r><w:pict><v:line id=\"edd_box_3\" o:spid=\"_x0000_s2003\" style=\"position:absolute;z-index:-251650000;mso-position-horizontal-relative:page;mso-position-vertical-relative:page\" from=\"540.5pt,30.0pt\" to=\"540.5pt,816.8pt\" strokecolor=\"black\" strokeweight=\".75pt\"><w10:anchorlock/><\/v:line><\/w:pict><\/w:r><w:r><w:pict><v:line id=\"edd_box_4\" o:spid=\"_x0000_s2004\" style=\"position:absolute;z-index:-251650000;mso-position-horizontal-relative:page;mso-position-vertical-relative:page\" from=\"55.2pt,816.8pt\" to=\"540.5pt,816.8pt\" strokecolor=\"black\" strokeweight=\".75pt\"><w10:anchorlock/><\/v:line><\/w:pict><\/w:r><w:r><w:pict><v:line id=\"edd_box_5\" o:spid=\"_x0000_s2005\" style=\"position:absolute;z-index:-251650000;mso-position-horizontal-relative:page;mso-position-vertical-relative:page\" from=\"55.2pt,30.0pt\" to=\"540.5pt,30.0pt\" strokecolor=\"black\" strokeweight=\".75pt\"><w10:anchorlock/><\/v:line><\/w:pict><\/w:r><\/w:p><\/w:hdr>", "word/styles.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:styles mc:Ignorable=\"w14 w15\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><\/w:rPr><\/w:rPrDefault><w:pPrDefault/><\/w:docDefaults><w:style w:type=\"paragraph\" w:styleId=\"Title\"><w:name w:val=\"Title\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:sz w:val=\"56\"/><w:szCs w:val=\"56\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Heading1\"><w:name w:val=\"Heading 1\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:color w:val=\"2E74B5\"/><w:sz w:val=\"32\"/><w:szCs w:val=\"32\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Heading2\"><w:name w:val=\"Heading 2\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:color w:val=\"2E74B5\"/><w:sz w:val=\"26\"/><w:szCs w:val=\"26\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Heading3\"><w:name w:val=\"Heading 3\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:color w:val=\"1F4D78\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Heading4\"><w:name w:val=\"Heading 4\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:i/><w:iCs/><w:color w:val=\"2E74B5\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Heading5\"><w:name w:val=\"Heading 5\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:color w:val=\"2E74B5\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Heading6\"><w:name w:val=\"Heading 6\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:color w:val=\"1F4D78\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Strong\"><w:name w:val=\"Strong\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:b/><w:bCs/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"ListParagraph\"><w:name w:val=\"List Paragraph\"/><w:basedOn w:val=\"Normal\"/><w:qFormat/><\/w:style><w:style w:type=\"character\" w:styleId=\"Hyperlink\"><w:name w:val=\"Hyperlink\"/><w:basedOn w:val=\"DefaultParagraphFont\"/><w:uiPriority w:val=\"99\"/><w:unhideWhenUsed/><w:rPr><w:color w:val=\"0563C1\"/><w:u w:val=\"single\"/><\/w:rPr><\/w:style><w:style w:type=\"character\" w:styleId=\"FootnoteReference\"><w:name w:val=\"footnote reference\"/><w:basedOn w:val=\"DefaultParagraphFont\"/><w:uiPriority w:val=\"99\"/><w:semiHidden/><w:unhideWhenUsed/><w:rPr><w:vertAlign w:val=\"superscript\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"FootnoteText\"><w:name w:val=\"footnote text\"/><w:basedOn w:val=\"Normal\"/><w:link w:val=\"FootnoteTextChar\"/><w:uiPriority w:val=\"99\"/><w:semiHidden/><w:unhideWhenUsed/><w:pPr><w:spacing w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><\/w:pPr><w:rPr><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><\/w:style><w:style w:type=\"character\" w:styleId=\"FootnoteTextChar\"><w:name w:val=\"Footnote Text Char\"/><w:basedOn w:val=\"DefaultParagraphFont\"/><w:link w:val=\"FootnoteText\"/><w:uiPriority w:val=\"99\"/><w:semiHidden/><w:unhideWhenUsed/><w:rPr><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><\/w:style><w:style w:type=\"character\" w:styleId=\"EndnoteReference\"><w:name w:val=\"endnote reference\"/><w:basedOn w:val=\"DefaultParagraphFont\"/><w:uiPriority w:val=\"99\"/><w:semiHidden/><w:unhideWhenUsed/><w:rPr><w:vertAlign w:val=\"superscript\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"EndnoteText\"><w:name w:val=\"endnote text\"/><w:basedOn w:val=\"Normal\"/><w:link w:val=\"EndnoteTextChar\"/><w:uiPriority w:val=\"99\"/><w:semiHidden/><w:unhideWhenUsed/><w:pPr><w:spacing w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><\/w:pPr><w:rPr><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><\/w:style><w:style w:type=\"character\" w:styleId=\"EndnoteTextChar\"><w:name w:val=\"Endnote Text Char\"/><w:basedOn w:val=\"DefaultParagraphFont\"/><w:link w:val=\"EndnoteText\"/><w:uiPriority w:val=\"99\"/><w:semiHidden/><w:unhideWhenUsed/><w:rPr><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><\/w:style><\/w:styles>", "word/numbering.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:numbering mc:Ignorable=\"w14 w15 wp14\" xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:wp14=\"http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:wpg=\"http://schemas.microsoft.com/office/word/2010/wordprocessingGroup\" xmlns:wpi=\"http://schemas.microsoft.com/office/word/2010/wordprocessingInk\" xmlns:wne=\"http://schemas.microsoft.com/office/word/2006/wordml\" xmlns:wps=\"http://schemas.microsoft.com/office/word/2010/wordprocessingShape\"><w:abstractNum w:abstractNumId=\"1\" w15:restartNumberingAfterBreak=\"0\"><w:multiLevelType w:val=\"hybridMultilevel\"/><w:lvl w:ilvl=\"0\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"●\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"720\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"1\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"○\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"1440\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"2\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"■\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"2160\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"3\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"●\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"2880\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"4\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"○\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"3600\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"5\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"■\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"4320\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"6\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"●\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"5040\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"7\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"●\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"5760\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"8\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"●\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"6480\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><\/w:abstractNum><w:num w:numId=\"1\"><w:abstractNumId w:val=\"1\"/><w:lvlOverride w:ilvl=\"0\"><w:startOverride w:val=\"1\"/><\/w:lvlOverride><\/w:num><\/w:numbering>", "word/document.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:document mc:Ignorable=\"w14 w15 wp14\" xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:wp14=\"http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:wpg=\"http://schemas.microsoft.com/office/word/2010/wordprocessingGroup\" xmlns:wpi=\"http://schemas.microsoft.com/office/word/2010/wordprocessingInk\" xmlns:wne=\"http://schemas.microsoft.com/office/word/2006/wordml\" xmlns:wps=\"http://schemas.microsoft.com/office/word/2010/wordprocessingShape\" xmlns:cx=\"http://schemas.microsoft.com/office/drawing/2014/chartex\" xmlns:cx1=\"http://schemas.microsoft.com/office/drawing/2015/9/8/chartex\" xmlns:cx2=\"http://schemas.microsoft.com/office/drawing/2015/10/21/chartex\" xmlns:cx3=\"http://schemas.microsoft.com/office/drawing/2016/5/9/chartex\" xmlns:cx4=\"http://schemas.microsoft.com/office/drawing/2016/5/10/chartex\" xmlns:cx5=\"http://schemas.microsoft.com/office/drawing/2016/5/11/chartex\" xmlns:cx6=\"http://schemas.microsoft.com/office/drawing/2016/5/12/chartex\" xmlns:cx7=\"http://schemas.microsoft.com/office/drawing/2016/5/13/chartex\" xmlns:cx8=\"http://schemas.microsoft.com/office/drawing/2016/5/14/chartex\" xmlns:aink=\"http://schemas.microsoft.com/office/drawing/2016/ink\" xmlns:am3d=\"http://schemas.microsoft.com/office/drawing/2017/model3d\" xmlns:w16cex=\"http://schemas.microsoft.com/office/word/2018/wordml/cex\" xmlns:w16cid=\"http://schemas.microsoft.com/office/word/2016/wordml/cid\" xmlns:w16=\"http://schemas.microsoft.com/office/word/2018/wordml\" xmlns:w16sdtdh=\"http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash\" xmlns:w16se=\"http://schemas.microsoft.com/office/word/2015/wordml/symex\"><w:body><w:tbl><w:tblPr><w:bidiVisual/><w:tblW w:type=\"dxa\" w:w=\"9700\"/><w:tblInd w:w=\"0\" w:type=\"dxa\"/><w:tblBorders><w:top w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:left w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:bottom w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:right w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:insideH w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:insideV w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><\/w:tblBorders><w:tblLayout w:type=\"fixed\"/><\/w:tblPr><w:tblGrid><w:gridCol w:w=\"2000\"/><w:gridCol w:w=\"5700\"/><w:gridCol w:w=\"2000\"/><\/w:tblGrid><w:tr><w:trPr><w:trHeight w:val=\"760\" w:hRule=\"exact\"/><\/w:trPr><w:tc><w:tcPr><w:tcW w:type=\"dxa\" w:w=\"2000\"/><w:tcBorders><w:top w:val=\"none\" w:color=\"FFFFFF\" w:sz=\"0\"/><w:left w:val=\"none\" w:color=\"FFFFFF\" w:sz=\"0\"/><w:bottom w:val=\"none\" w:color=\"FFFFFF\" w:sz=\"0\"/><w:right w:val=\"none\" w:color=\"FFFFFF\" w:sz=\"0\"/><\/w:tcBorders><w:tcMar><w:top w:type=\"dxa\" w:w=\"80\"/><w:left w:type=\"dxa\" w:w=\"120\"/><w:bottom w:type=\"dxa\" w:w=\"80\"/><w:right w:type=\"dxa\" w:w=\"120\"/><\/w:tcMar><w:vAlign w:val=\"top\"/><\/w:tcPr><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\"><\/w:t><\/w:r><\/w:p><\/w:tc><w:tc><w:tcPr><w:tcW w:type=\"dxa\" w:w=\"5700\"/><w:tcBorders><w:top w:val=\"none\" w:color=\"FFFFFF\" w:sz=\"0\"/><w:left w:val=\"none\" w:color=\"FFFFFF\" w:sz=\"0\"/><w:bottom w:val=\"none\" w:color=\"FFFFFF\" w:sz=\"0\"/><w:right w:val=\"none\" w:color=\"FFFFFF\" w:sz=\"0\"/><\/w:tcBorders><w:tcMar><w:top w:type=\"dxa\" w:w=\"80\"/><w:left w:type=\"dxa\" w:w=\"120\"/><w:bottom w:type=\"dxa\" w:w=\"80\"/><w:right w:type=\"dxa\" w:w=\"120\"/><\/w:tcMar><w:vAlign w:val=\"top\"/><\/w:tcPr><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"center\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">الجمهورية الجزائرية الديمقراطية الشعبية<\/w:t><\/w:r><\/w:p><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"center\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"26\"/><w:szCs w:val=\"26\"/><w:u w:val=\"single\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">وزارة المالـــــــية<\/w:t><\/w:r><\/w:p><\/w:tc><w:tc><w:tcPr><w:tcW w:type=\"dxa\" w:w=\"2000\"/><w:tcBorders><w:top w:val=\"none\" w:color=\"FFFFFF\" w:sz=\"0\"/><w:left w:val=\"none\" w:color=\"FFFFFF\" w:sz=\"0\"/><w:bottom w:val=\"none\" w:color=\"FFFFFF\" w:sz=\"0\"/><w:right w:val=\"none\" w:color=\"FFFFFF\" w:sz=\"0\"/><\/w:tcBorders><w:tcMar><w:top w:type=\"dxa\" w:w=\"80\"/><w:left w:type=\"dxa\" w:w=\"120\"/><w:bottom w:type=\"dxa\" w:w=\"80\"/><w:right w:type=\"dxa\" w:w=\"120\"/><\/w:tcMar><w:vAlign w:val=\"top\"/><\/w:tcPr><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"14\"/><w:szCs w:val=\"14\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">سلسلة إ ع نموذج رقم 6<\/w:t><\/w:r><\/w:p><\/w:tc><\/w:tr><\/w:tbl><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"300\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">المديرية العامة للأملاك الوطنية<\/w:t><\/w:r><\/w:p><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">مديرية الحفظ العقاري لولاية : {{WILAYA}}<\/w:t><\/w:r><\/w:p><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"120\" w:line=\"520\" w:lineRule=\"exact\"/><w:jc w:val=\"center\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"36\"/><w:szCs w:val=\"36\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">إجــراء إشهار عقاري<\/w:t><\/w:r><\/w:p><w:tbl><w:tblPr><w:bidiVisual/><w:tblW w:type=\"dxa\" w:w=\"9700\"/><w:tblInd w:w=\"0\" w:type=\"dxa\"/><w:tblBorders><w:top w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:left w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:bottom w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:right w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:insideH w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:insideV w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><\/w:tblBorders><w:tblLayout w:type=\"fixed\"/><\/w:tblPr><w:tblGrid><w:gridCol w:w=\"2762\"/><w:gridCol w:w=\"4513\"/><w:gridCol w:w=\"2425\"/><\/w:tblGrid><w:tr><w:trPr><w:trHeight w:val=\"1300\" w:hRule=\"exact\"/><\/w:trPr><w:tc><w:tcPr><w:tcW w:type=\"dxa\" w:w=\"2762\"/><w:tcBorders><w:top w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:left w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:bottom w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:right w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><\/w:tcBorders><w:tcMar><w:top w:type=\"dxa\" w:w=\"80\"/><w:left w:type=\"dxa\" w:w=\"120\"/><w:bottom w:type=\"dxa\" w:w=\"80\"/><w:right w:type=\"dxa\" w:w=\"120\"/><\/w:tcMar><w:vAlign w:val=\"top\"/><\/w:tcPr><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">إيداع<\/w:t><\/w:r><\/w:p><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"60\" w:line=\"276\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">حجم {{IDA_HAJM}}<\/w:t><\/w:r><\/w:p><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"60\" w:line=\"276\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">رقم {{IDA_RAQM}}<\/w:t><\/w:r><\/w:p><\/w:tc><w:tc><w:tcPr><w:tcW w:type=\"dxa\" w:w=\"4513\"/><w:tcBorders><w:top w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:left w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:bottom w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:right w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><\/w:tcBorders><w:tcMar><w:top w:type=\"dxa\" w:w=\"80\"/><w:left w:type=\"dxa\" w:w=\"120\"/><w:bottom w:type=\"dxa\" w:w=\"80\"/><w:right w:type=\"dxa\" w:w=\"120\"/><\/w:tcMar><w:vAlign w:val=\"top\"/><\/w:tcPr><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"100\" w:line=\"276\"/><w:jc w:val=\"center\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">في {{FI}}<\/w:t><\/w:r><\/w:p><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"140\" w:line=\"276\"/><w:jc w:val=\"center\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">مجلد {{MUJALLAD}} رقم {{MUJ_RAQM}}<\/w:t><\/w:r><\/w:p><\/w:tc><w:tc><w:tcPr><w:tcW w:type=\"dxa\" w:w=\"2425\"/><w:tcBorders><w:top w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:left w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:bottom w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:right w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><\/w:tcBorders><w:tcMar><w:top w:type=\"dxa\" w:w=\"80\"/><w:left w:type=\"dxa\" w:w=\"120\"/><w:bottom w:type=\"dxa\" w:w=\"80\"/><w:right w:type=\"dxa\" w:w=\"120\"/><\/w:tcMar><w:vAlign w:val=\"top\"/><\/w:tcPr><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">رسم {{RASM}}<\/w:t><\/w:r><\/w:p><\/w:tc><\/w:tr><\/w:tbl><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"160\" w:lineRule=\"exact\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:sz w:val=\"8\"/><w:szCs w:val=\"8\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\"><\/w:t><\/w:r><\/w:p><w:tbl><w:tblPr><w:bidiVisual/><w:tblW w:type=\"dxa\" w:w=\"9700\"/><w:tblInd w:w=\"0\" w:type=\"dxa\"/><w:tblBorders><w:top w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:left w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:bottom w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:right w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:insideH w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><w:insideV w:val=\"single\" w:color=\"auto\" w:sz=\"4\"/><\/w:tblBorders><w:tblLayout w:type=\"fixed\"/><\/w:tblPr><w:tblGrid><w:gridCol w:w=\"2762\"/><w:gridCol w:w=\"2358\"/><w:gridCol w:w=\"4580\"/><\/w:tblGrid><w:tr><w:trPr><w:trHeight w:val=\"1700\" w:hRule=\"exact\"/><\/w:trPr><w:tc><w:tcPr><w:tcW w:type=\"dxa\" w:w=\"2762\"/><w:tcBorders><w:top w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:left w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:bottom w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:right w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><\/w:tcBorders><w:tcMar><w:top w:type=\"dxa\" w:w=\"80\"/><w:left w:type=\"dxa\" w:w=\"120\"/><w:bottom w:type=\"dxa\" w:w=\"80\"/><w:right w:type=\"dxa\" w:w=\"120\"/><\/w:tcMar><w:vAlign w:val=\"top\"/><\/w:tcPr><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">إطار مخصص للمحافظ العقاري ل<\/w:t><\/w:r><\/w:p><\/w:tc><w:tc><w:tcPr><w:tcW w:type=\"dxa\" w:w=\"2358\"/><w:tcBorders><w:top w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:left w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:bottom w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:right w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><\/w:tcBorders><w:tcMar><w:top w:type=\"dxa\" w:w=\"80\"/><w:left w:type=\"dxa\" w:w=\"120\"/><w:bottom w:type=\"dxa\" w:w=\"80\"/><w:right w:type=\"dxa\" w:w=\"120\"/><\/w:tcMar><w:vAlign w:val=\"center\"/><\/w:tcPr><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"center\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">مراجع مسح الأراضي (في حالة عقار ممسوح)<\/w:t><\/w:r><\/w:p><\/w:tc><w:tc><w:tcPr><w:tcW w:type=\"dxa\" w:w=\"4580\"/><w:tcBorders><w:top w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:left w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:bottom w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><w:right w:val=\"single\" w:color=\"000000\" w:sz=\"6\"/><\/w:tcBorders><w:tcMar><w:top w:type=\"dxa\" w:w=\"80\"/><w:left w:type=\"dxa\" w:w=\"120\"/><w:bottom w:type=\"dxa\" w:w=\"80\"/><w:right w:type=\"dxa\" w:w=\"120\"/><\/w:tcMar><w:vAlign w:val=\"top\"/><\/w:tcPr><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"center\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">قسم : {{QISM}}<\/w:t><\/w:r><\/w:p><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">بلدية : {{BALADIYA}}<\/w:t><\/w:r><\/w:p><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">مجموعة ملكية رقم : {{MAJMOUA}}<\/w:t><\/w:r><\/w:p><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:b/><w:bCs/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\">حصة رقم : {{HISSA}}<\/w:t><\/w:r><\/w:p><\/w:tc><\/w:tr><w:tr><w:trPr><w:trHeight w:val=\"2000\" w:hRule=\"atLeast\"/><\/w:trPr><w:tc><w:tcPr><w:tcW w:type=\"dxa\" w:w=\"2762\"/><w:tcBorders><w:top w:val=\"nil\"/><w:left w:val=\"nil\"/><w:bottom w:val=\"nil\"/><w:right w:val=\"nil\"/><\/w:tcBorders><w:tcMar><w:top w:type=\"dxa\" w:w=\"80\"/><w:left w:type=\"dxa\" w:w=\"120\"/><w:bottom w:type=\"dxa\" w:w=\"80\"/><w:right w:type=\"dxa\" w:w=\"120\"/><\/w:tcMar><w:vAlign w:val=\"top\"/><\/w:tcPr><w:p><w:pPr><w:bidi/><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"300\" w:lineRule=\"exact\"/><w:jc w:val=\"start\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><w:rtl/><\/w:rPr><w:t xml:space=\"preserve\"><\/w:t><\/w:r><\/w:p><\/w:tc><w:tc><w:tcPr><w:tcW w:type=\"dxa\" w:w=\"6938\"/><w:gridSpan w:val=\"2\"/><w:tcBorders><w:top w:val=\"nil\"/><w:left w:val=\"nil\"/><w:bottom w:val=\"nil\"/><w:right w:val=\"nil\"/><\/w:tcBorders><w:tcMar><w:top w:type=\"dxa\" w:w=\"80\"/><w:left w:type=\"dxa\" w:w=\"120\"/><w:bottom w:type=\"dxa\" w:w=\"80\"/><w:right w:type=\"dxa\" w:w=\"120\"/><\/w:tcMar><w:vAlign w:val=\"top\"/><\/w:tcPr>{{CONTENT}}<\/w:tc><\/w:tr><\/w:tbl><w:p><w:pPr><w:spacing w:after=\"0\" w:before=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/><\/w:rPr><\/w:pPr><\/w:p><w:sectPr><w:headerReference w:type=\"default\" r:id=\"rIdHdr1\"/><w:headerReference w:type=\"first\" r:id=\"rIdHdr2\"/><w:footerReference w:type=\"default\" r:id=\"rIdFtr1\"/><w:footerReference w:type=\"first\" r:id=\"rIdFtr1\"/><w:pgSz w:w=\"11906\" w:h=\"16838\" w:orient=\"portrait\"/><w:pgMar w:top=\"600\" w:right=\"1100\" w:bottom=\"1920\" w:left=\"1100\" w:header=\"200\" w:footer=\"150\" w:gutter=\"0\"/><w:pgNumType w:start=\"1\"/><w:titlePg/><w:docGrid w:linePitch=\"360\"/><\/w:sectPr><\/w:body><\/w:document>", "word/comments.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:comments xmlns:cx=\"http://schemas.microsoft.com/office/drawing/2014/chartex\" xmlns:cx1=\"http://schemas.microsoft.com/office/drawing/2015/9/8/chartex\" xmlns:cx2=\"http://schemas.microsoft.com/office/drawing/2015/10/21/chartex\" xmlns:cx3=\"http://schemas.microsoft.com/office/drawing/2016/5/9/chartex\" xmlns:cx4=\"http://schemas.microsoft.com/office/drawing/2016/5/10/chartex\" xmlns:cx5=\"http://schemas.microsoft.com/office/drawing/2016/5/11/chartex\" xmlns:cx6=\"http://schemas.microsoft.com/office/drawing/2016/5/12/chartex\" xmlns:cx7=\"http://schemas.microsoft.com/office/drawing/2016/5/13/chartex\" xmlns:cx8=\"http://schemas.microsoft.com/office/drawing/2016/5/14/chartex\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:aink=\"http://schemas.microsoft.com/office/drawing/2016/ink\" xmlns:am3d=\"http://schemas.microsoft.com/office/drawing/2017/model3d\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:wp14=\"http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:w16cex=\"http://schemas.microsoft.com/office/word/2018/wordml/cex\" xmlns:w16cid=\"http://schemas.microsoft.com/office/word/2016/wordml/cid\" xmlns:w16=\"http://schemas.microsoft.com/office/word/2018/wordml\" xmlns:w16sdtdh=\"http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash\" xmlns:w16se=\"http://schemas.microsoft.com/office/word/2015/wordml/symex\" xmlns:wpg=\"http://schemas.microsoft.com/office/word/2010/wordprocessingGroup\" xmlns:wpi=\"http://schemas.microsoft.com/office/word/2010/wordprocessingInk\" xmlns:wne=\"http://schemas.microsoft.com/office/word/2006/wordml\" xmlns:wps=\"http://schemas.microsoft.com/office/word/2010/wordprocessingShape\"/>", "word/settings.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:settings xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:wp14=\"http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:wpg=\"http://schemas.microsoft.com/office/word/2010/wordprocessingGroup\" xmlns:wpi=\"http://schemas.microsoft.com/office/word/2010/wordprocessingInk\" xmlns:wne=\"http://schemas.microsoft.com/office/word/2006/wordml\" xmlns:wps=\"http://schemas.microsoft.com/office/word/2010/wordprocessingShape\" mc:Ignorable=\"w14 w15 wp14\"><w:displayBackgroundShape/><w:evenAndOddHeaders w:val=\"false\"/><w:compat><w:compatSetting w:val=\"15\" w:name=\"compatibilityMode\" w:uri=\"http://schemas.microsoft.com/office/word\"/><\/w:compat><\/w:settings>", "word/fontTable.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:fonts xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:w16cex=\"http://schemas.microsoft.com/office/word/2018/wordml/cex\" xmlns:w16cid=\"http://schemas.microsoft.com/office/word/2016/wordml/cid\" xmlns:w16=\"http://schemas.microsoft.com/office/word/2018/wordml\" xmlns:w16sdtdh=\"http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash\" xmlns:w16se=\"http://schemas.microsoft.com/office/word/2015/wordml/symex\" mc:Ignorable=\"w14 w15 w16se w16cid w16 w16cex w16sdtdh\"/>", "word/header2.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:hdr xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\"><w:p><w:pPr><w:spacing w:before=\"0\" w:after=\"0\" w:line=\"20\" w:lineRule=\"exact\"/><w:rPr><w:sz w:val=\"2\"/><w:szCs w:val=\"2\"/><\/w:rPr><\/w:pPr><w:r><w:pict><v:line id=\"edd_box_1\" o:spid=\"_x0000_s2001\" style=\"position:absolute;z-index:-251650000;mso-position-horizontal-relative:page;mso-position-vertical-relative:page\" from=\"55.2pt,304.2pt\" to=\"55.2pt,816.8pt\" strokecolor=\"black\" strokeweight=\".75pt\"><w10:anchorlock/><\/v:line><\/w:pict><\/w:r><w:r><w:pict><v:line id=\"edd_box_2\" o:spid=\"_x0000_s2002\" style=\"position:absolute;z-index:-251650000;mso-position-horizontal-relative:page;mso-position-vertical-relative:page\" from=\"402.2pt,304.2pt\" to=\"402.2pt,816.8pt\" strokecolor=\"black\" strokeweight=\".75pt\"><w10:anchorlock/><\/v:line><\/w:pict><\/w:r><w:r><w:pict><v:line id=\"edd_box_3\" o:spid=\"_x0000_s2003\" style=\"position:absolute;z-index:-251650000;mso-position-horizontal-relative:page;mso-position-vertical-relative:page\" from=\"540.5pt,304.2pt\" to=\"540.5pt,816.8pt\" strokecolor=\"black\" strokeweight=\".75pt\"><w10:anchorlock/><\/v:line><\/w:pict><\/w:r><w:r><w:pict><v:line id=\"edd_box_4\" o:spid=\"_x0000_s2004\" style=\"position:absolute;z-index:-251650000;mso-position-horizontal-relative:page;mso-position-vertical-relative:page\" from=\"55.2pt,816.8pt\" to=\"540.5pt,816.8pt\" strokecolor=\"black\" strokeweight=\".75pt\"><w10:anchorlock/><\/v:line><\/w:pict><\/w:r><\/w:p><\/w:hdr>", "word/footnotes.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:footnotes xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:wp14=\"http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:wpg=\"http://schemas.microsoft.com/office/word/2010/wordprocessingGroup\" xmlns:wpi=\"http://schemas.microsoft.com/office/word/2010/wordprocessingInk\" xmlns:wne=\"http://schemas.microsoft.com/office/word/2006/wordml\" xmlns:wps=\"http://schemas.microsoft.com/office/word/2010/wordprocessingShape\" mc:Ignorable=\"w14 w15 wp14\"><w:footnote w:type=\"separator\" w:id=\"-1\"><w:p><w:pPr><w:spacing w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><\/w:pPr><w:r><w:rPr><w:rStyle w:val=\"FootnoteReference\"/><\/w:rPr><w:footnoteRef/><\/w:r><w:r><w:separator/><\/w:r><\/w:p><\/w:footnote><w:footnote w:type=\"continuationSeparator\" w:id=\"0\"><w:p><w:pPr><w:spacing w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><\/w:pPr><w:r><w:rPr><w:rStyle w:val=\"FootnoteReference\"/><\/w:rPr><w:footnoteRef/><\/w:r><w:r><w:continuationSeparator/><\/w:r><\/w:p><\/w:footnote><\/w:footnotes>", "word/endnotes.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><w:endnotes xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:wp14=\"http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:wpg=\"http://schemas.microsoft.com/office/word/2010/wordprocessingGroup\" xmlns:wpi=\"http://schemas.microsoft.com/office/word/2010/wordprocessingInk\" xmlns:wne=\"http://schemas.microsoft.com/office/word/2006/wordml\" xmlns:wps=\"http://schemas.microsoft.com/office/word/2010/wordprocessingShape\" mc:Ignorable=\"w14 w15 wp14\"><w:endnote w:type=\"separator\" w:id=\"-1\"><w:p><w:pPr><w:spacing w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><\/w:pPr><w:r><w:rPr><w:rStyle w:val=\"EndnoteReference\"/><\/w:rPr><w:endnoteRef/><\/w:r><w:r><w:separator/><\/w:r><\/w:p><\/w:endnote><w:endnote w:type=\"continuationSeparator\" w:id=\"0\"><w:p><w:pPr><w:spacing w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><\/w:pPr><w:r><w:rPr><w:rStyle w:val=\"EndnoteReference\"/><\/w:rPr><w:endnoteRef/><\/w:r><w:r><w:continuationSeparator/><\/w:r><\/w:p><\/w:endnote><\/w:endnotes>", "word/footer1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:ftr xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><w:p><w:pPr><w:spacing w:before=\"0\" w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><w:jc w:val=\"center\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><w:fldChar w:fldCharType=\"begin\"/><\/w:r><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><w:instrText xml:space=\"preserve\"> PAGE <\/w:instrText><\/w:r><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><w:fldChar w:fldCharType=\"separate\"/><\/w:r><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><w:t>1<\/w:t><\/w:r><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><w:fldChar w:fldCharType=\"end\"/><\/w:r><\/w:p><\/w:ftr>", "word/_rels/endnotes.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"/>", "word/_rels/document.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering\" Target=\"numbering.xml\"/><Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes\" Target=\"footnotes.xml\"/><Relationship Id=\"rId4\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes\" Target=\"endnotes.xml\"/><Relationship Id=\"rId5\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings\" Target=\"settings.xml\"/><Relationship Id=\"rId6\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments\" Target=\"comments.xml\"/><Relationship Id=\"rId7\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable\" Target=\"fontTable.xml\"/><Relationship Id=\"rIdFtr1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer\" Target=\"footer1.xml\"/><Relationship Id=\"rIdHdr1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/header\" Target=\"header1.xml\"/><Relationship Id=\"rIdHdr2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/header\" Target=\"header2.xml\"/><\/Relationships>", "word/_rels/comments.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"/>", "word/_rels/footnotes.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"/>", "word/_rels/fontTable.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"/>", "docProps/app.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/extended-properties\" xmlns:vt=\"http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes\"/>", "docProps/core.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><cp:coreProperties xmlns:cp=\"http://schemas.openxmlformats.org/package/2006/metadata/core-properties\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:dcmitype=\"http://purl.org/dc/dcmitype/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><dc:creator>Un-named<\/dc:creator><cp:lastModifiedBy>Un-named<\/cp:lastModifiedBy><cp:revision>1<\/cp:revision><dcterms:created xsi:type=\"dcterms:W3CDTF\">2026-10-17T16:32:41.470Z<\/dcterms:created><dcterms:modified xsi:type=\"dcterms:W3CDTF\">2026-10-17T16:32:41.474Z<\/dcterms:modified><\/cp:coreProperties>", "docProps/custom.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/custom-properties\" xmlns:vt=\"http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes\"/>", "_rels/.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" Target=\"word/document.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties\" Target=\"docProps/core.xml\"/><Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties\" Target=\"docProps/app.xml\"/><Relationship Id=\"rId4\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties\" Target=\"docProps/custom.xml\"/><\/Relationships>"}, "s556": {"[Content_Types].xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default ContentType=\"image/png\" Extension=\"png\"/><Default ContentType=\"image/jpeg\" Extension=\"jpeg\"/><Default ContentType=\"image/jpeg\" Extension=\"jpg\"/><Default ContentType=\"image/bmp\" Extension=\"bmp\"/><Default ContentType=\"image/gif\" Extension=\"gif\"/><Default ContentType=\"image/svg+xml\" Extension=\"svg\"/><Default ContentType=\"application/vnd.openxmlformats-package.relationships+xml\" Extension=\"rels\"/><Default ContentType=\"application/xml\" Extension=\"xml\"/><Default ContentType=\"application/vnd.openxmlformats-officedocument.obfuscatedFont\" Extension=\"odttf\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml\" PartName=\"/word/document.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml\" PartName=\"/word/styles.xml\"/><Override ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\" PartName=\"/docProps/core.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.custom-properties+xml\" PartName=\"/docProps/custom.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\" PartName=\"/docProps/app.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml\" PartName=\"/word/numbering.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml\" PartName=\"/word/footnotes.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml\" PartName=\"/word/endnotes.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml\" PartName=\"/word/settings.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml\" PartName=\"/word/comments.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml\" PartName=\"/word/fontTable.xml\"/><Override ContentType=\"application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml\" PartName=\"/word/footer1.xml\"/><\/Types>", "word/styles.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:styles mc:Ignorable=\"w14 w15\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii=\"Arial\" w:cs=\"Arial\" w:hAnsi=\"Arial\"/><w:sz w:val=\"22\"/><w:szCs w:val=\"22\"/><\/w:rPr><\/w:rPrDefault><w:pPrDefault/><\/w:docDefaults><w:style w:type=\"paragraph\" w:styleId=\"Title\"><w:name w:val=\"Title\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:sz w:val=\"56\"/><w:szCs w:val=\"56\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Heading1\"><w:name w:val=\"Heading 1\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:color w:val=\"2E74B5\"/><w:sz w:val=\"32\"/><w:szCs w:val=\"32\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Heading2\"><w:name w:val=\"Heading 2\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:color w:val=\"2E74B5\"/><w:sz w:val=\"26\"/><w:szCs w:val=\"26\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Heading3\"><w:name w:val=\"Heading 3\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:color w:val=\"1F4D78\"/><w:sz w:val=\"24\"/><w:szCs w:val=\"24\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Heading4\"><w:name w:val=\"Heading 4\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:i/><w:iCs/><w:color w:val=\"2E74B5\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Heading5\"><w:name w:val=\"Heading 5\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:color w:val=\"2E74B5\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Heading6\"><w:name w:val=\"Heading 6\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:color w:val=\"1F4D78\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"Strong\"><w:name w:val=\"Strong\"/><w:basedOn w:val=\"Normal\"/><w:next w:val=\"Normal\"/><w:qFormat/><w:rPr><w:b/><w:bCs/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"ListParagraph\"><w:name w:val=\"List Paragraph\"/><w:basedOn w:val=\"Normal\"/><w:qFormat/><\/w:style><w:style w:type=\"character\" w:styleId=\"Hyperlink\"><w:name w:val=\"Hyperlink\"/><w:basedOn w:val=\"DefaultParagraphFont\"/><w:uiPriority w:val=\"99\"/><w:unhideWhenUsed/><w:rPr><w:color w:val=\"0563C1\"/><w:u w:val=\"single\"/><\/w:rPr><\/w:style><w:style w:type=\"character\" w:styleId=\"FootnoteReference\"><w:name w:val=\"footnote reference\"/><w:basedOn w:val=\"DefaultParagraphFont\"/><w:uiPriority w:val=\"99\"/><w:semiHidden/><w:unhideWhenUsed/><w:rPr><w:vertAlign w:val=\"superscript\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"FootnoteText\"><w:name w:val=\"footnote text\"/><w:basedOn w:val=\"Normal\"/><w:link w:val=\"FootnoteTextChar\"/><w:uiPriority w:val=\"99\"/><w:semiHidden/><w:unhideWhenUsed/><w:pPr><w:spacing w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><\/w:pPr><w:rPr><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><\/w:style><w:style w:type=\"character\" w:styleId=\"FootnoteTextChar\"><w:name w:val=\"Footnote Text Char\"/><w:basedOn w:val=\"DefaultParagraphFont\"/><w:link w:val=\"FootnoteText\"/><w:uiPriority w:val=\"99\"/><w:semiHidden/><w:unhideWhenUsed/><w:rPr><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><\/w:style><w:style w:type=\"character\" w:styleId=\"EndnoteReference\"><w:name w:val=\"endnote reference\"/><w:basedOn w:val=\"DefaultParagraphFont\"/><w:uiPriority w:val=\"99\"/><w:semiHidden/><w:unhideWhenUsed/><w:rPr><w:vertAlign w:val=\"superscript\"/><\/w:rPr><\/w:style><w:style w:type=\"paragraph\" w:styleId=\"EndnoteText\"><w:name w:val=\"endnote text\"/><w:basedOn w:val=\"Normal\"/><w:link w:val=\"EndnoteTextChar\"/><w:uiPriority w:val=\"99\"/><w:semiHidden/><w:unhideWhenUsed/><w:pPr><w:spacing w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><\/w:pPr><w:rPr><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><\/w:style><w:style w:type=\"character\" w:styleId=\"EndnoteTextChar\"><w:name w:val=\"Endnote Text Char\"/><w:basedOn w:val=\"DefaultParagraphFont\"/><w:link w:val=\"EndnoteText\"/><w:uiPriority w:val=\"99\"/><w:semiHidden/><w:unhideWhenUsed/><w:rPr><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><\/w:style><\/w:styles>", "word/numbering.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:numbering mc:Ignorable=\"w14 w15 wp14\" xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:wp14=\"http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:wpg=\"http://schemas.microsoft.com/office/word/2010/wordprocessingGroup\" xmlns:wpi=\"http://schemas.microsoft.com/office/word/2010/wordprocessingInk\" xmlns:wne=\"http://schemas.microsoft.com/office/word/2006/wordml\" xmlns:wps=\"http://schemas.microsoft.com/office/word/2010/wordprocessingShape\"><w:abstractNum w:abstractNumId=\"1\" w15:restartNumberingAfterBreak=\"0\"><w:multiLevelType w:val=\"hybridMultilevel\"/><w:lvl w:ilvl=\"0\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"●\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"720\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"1\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"○\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"1440\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"2\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"■\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"2160\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"3\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"●\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"2880\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"4\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"○\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"3600\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"5\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"■\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"4320\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"6\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"●\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"5040\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"7\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"●\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"5760\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><w:lvl w:ilvl=\"8\" w15:tentative=\"1\"><w:start w:val=\"1\"/><w:numFmt w:val=\"bullet\"/><w:lvlText w:val=\"●\"/><w:lvlJc w:val=\"left\"/><w:pPr><w:ind w:left=\"6480\" w:hanging=\"360\"/><\/w:pPr><\/w:lvl><\/w:abstractNum><w:num w:numId=\"1\"><w:abstractNumId w:val=\"1\"/><w:lvlOverride w:ilvl=\"0\"><w:startOverride w:val=\"1\"/><\/w:lvlOverride><\/w:num><\/w:numbering>", "word/document.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:document mc:Ignorable=\"w14 w15 wp14\" xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:wp14=\"http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:wpg=\"http://schemas.microsoft.com/office/word/2010/wordprocessingGroup\" xmlns:wpi=\"http://schemas.microsoft.com/office/word/2010/wordprocessingInk\" xmlns:wne=\"http://schemas.microsoft.com/office/word/2006/wordml\" xmlns:wps=\"http://schemas.microsoft.com/office/word/2010/wordprocessingShape\" xmlns:cx=\"http://schemas.microsoft.com/office/drawing/2014/chartex\" xmlns:cx1=\"http://schemas.microsoft.com/office/drawing/2015/9/8/chartex\" xmlns:cx2=\"http://schemas.microsoft.com/office/drawing/2015/10/21/chartex\" xmlns:cx3=\"http://schemas.microsoft.com/office/drawing/2016/5/9/chartex\" xmlns:cx4=\"http://schemas.microsoft.com/office/drawing/2016/5/10/chartex\" xmlns:cx5=\"http://schemas.microsoft.com/office/drawing/2016/5/11/chartex\" xmlns:cx6=\"http://schemas.microsoft.com/office/drawing/2016/5/12/chartex\" xmlns:cx7=\"http://schemas.microsoft.com/office/drawing/2016/5/13/chartex\" xmlns:cx8=\"http://schemas.microsoft.com/office/drawing/2016/5/14/chartex\" xmlns:aink=\"http://schemas.microsoft.com/office/drawing/2016/ink\" xmlns:am3d=\"http://schemas.microsoft.com/office/drawing/2017/model3d\" xmlns:w16cex=\"http://schemas.microsoft.com/office/word/2018/wordml/cex\" xmlns:w16cid=\"http://schemas.microsoft.com/office/word/2016/wordml/cid\" xmlns:w16=\"http://schemas.microsoft.com/office/word/2018/wordml\" xmlns:w16sdtdh=\"http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash\" xmlns:w16se=\"http://schemas.microsoft.com/office/word/2015/wordml/symex\"><w:body>{{BODY}}<w:sectPr><w:footerReference w:type=\"default\" r:id=\"rIdFtr1\"/><w:pgSz w:w=\"16838\" w:h=\"11906\" w:orient=\"landscape\"/><w:pgMar w:top=\"1417\" w:right=\"1417\" w:bottom=\"1417\" w:left=\"1417\" w:header=\"708\" w:footer=\"708\" w:gutter=\"0\"/><w:bidi/><w:docGrid w:linePitch=\"360\"/><\/w:sectPr><\/w:body><\/w:document>", "word/comments.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:comments xmlns:cx=\"http://schemas.microsoft.com/office/drawing/2014/chartex\" xmlns:cx1=\"http://schemas.microsoft.com/office/drawing/2015/9/8/chartex\" xmlns:cx2=\"http://schemas.microsoft.com/office/drawing/2015/10/21/chartex\" xmlns:cx3=\"http://schemas.microsoft.com/office/drawing/2016/5/9/chartex\" xmlns:cx4=\"http://schemas.microsoft.com/office/drawing/2016/5/10/chartex\" xmlns:cx5=\"http://schemas.microsoft.com/office/drawing/2016/5/11/chartex\" xmlns:cx6=\"http://schemas.microsoft.com/office/drawing/2016/5/12/chartex\" xmlns:cx7=\"http://schemas.microsoft.com/office/drawing/2016/5/13/chartex\" xmlns:cx8=\"http://schemas.microsoft.com/office/drawing/2016/5/14/chartex\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:aink=\"http://schemas.microsoft.com/office/drawing/2016/ink\" xmlns:am3d=\"http://schemas.microsoft.com/office/drawing/2017/model3d\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:wp14=\"http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:w16cex=\"http://schemas.microsoft.com/office/word/2018/wordml/cex\" xmlns:w16cid=\"http://schemas.microsoft.com/office/word/2016/wordml/cid\" xmlns:w16=\"http://schemas.microsoft.com/office/word/2018/wordml\" xmlns:w16sdtdh=\"http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash\" xmlns:w16se=\"http://schemas.microsoft.com/office/word/2015/wordml/symex\" xmlns:wpg=\"http://schemas.microsoft.com/office/word/2010/wordprocessingGroup\" xmlns:wpi=\"http://schemas.microsoft.com/office/word/2010/wordprocessingInk\" xmlns:wne=\"http://schemas.microsoft.com/office/word/2006/wordml\" xmlns:wps=\"http://schemas.microsoft.com/office/word/2010/wordprocessingShape\"/>", "word/settings.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:settings xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:wp14=\"http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:wpg=\"http://schemas.microsoft.com/office/word/2010/wordprocessingGroup\" xmlns:wpi=\"http://schemas.microsoft.com/office/word/2010/wordprocessingInk\" xmlns:wne=\"http://schemas.microsoft.com/office/word/2006/wordml\" xmlns:wps=\"http://schemas.microsoft.com/office/word/2010/wordprocessingShape\" mc:Ignorable=\"w14 w15 wp14\"><w:displayBackgroundShape/><w:evenAndOddHeaders w:val=\"false\"/><w:compat><w:compatSetting w:val=\"15\" w:name=\"compatibilityMode\" w:uri=\"http://schemas.microsoft.com/office/word\"/><\/w:compat><\/w:settings>", "word/fontTable.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:fonts xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:w16cex=\"http://schemas.microsoft.com/office/word/2018/wordml/cex\" xmlns:w16cid=\"http://schemas.microsoft.com/office/word/2016/wordml/cid\" xmlns:w16=\"http://schemas.microsoft.com/office/word/2018/wordml\" xmlns:w16sdtdh=\"http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash\" xmlns:w16se=\"http://schemas.microsoft.com/office/word/2015/wordml/symex\" mc:Ignorable=\"w14 w15 w16se w16cid w16 w16cex w16sdtdh\"/>", "word/footnotes.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:footnotes xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:wp14=\"http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:wpg=\"http://schemas.microsoft.com/office/word/2010/wordprocessingGroup\" xmlns:wpi=\"http://schemas.microsoft.com/office/word/2010/wordprocessingInk\" xmlns:wne=\"http://schemas.microsoft.com/office/word/2006/wordml\" xmlns:wps=\"http://schemas.microsoft.com/office/word/2010/wordprocessingShape\" mc:Ignorable=\"w14 w15 wp14\"><w:footnote w:type=\"separator\" w:id=\"-1\"><w:p><w:pPr><w:spacing w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><\/w:pPr><w:r><w:rPr><w:rStyle w:val=\"FootnoteReference\"/><\/w:rPr><w:footnoteRef/><\/w:r><w:r><w:separator/><\/w:r><\/w:p><\/w:footnote><w:footnote w:type=\"continuationSeparator\" w:id=\"0\"><w:p><w:pPr><w:spacing w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><\/w:pPr><w:r><w:rPr><w:rStyle w:val=\"FootnoteReference\"/><\/w:rPr><w:footnoteRef/><\/w:r><w:r><w:continuationSeparator/><\/w:r><\/w:p><\/w:footnote><\/w:footnotes>", "word/endnotes.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><w:endnotes xmlns:wpc=\"http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:wp14=\"http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:w10=\"urn:schemas-microsoft-com:office:word\" xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:w14=\"http://schemas.microsoft.com/office/word/2010/wordml\" xmlns:w15=\"http://schemas.microsoft.com/office/word/2012/wordml\" xmlns:wpg=\"http://schemas.microsoft.com/office/word/2010/wordprocessingGroup\" xmlns:wpi=\"http://schemas.microsoft.com/office/word/2010/wordprocessingInk\" xmlns:wne=\"http://schemas.microsoft.com/office/word/2006/wordml\" xmlns:wps=\"http://schemas.microsoft.com/office/word/2010/wordprocessingShape\" mc:Ignorable=\"w14 w15 wp14\"><w:endnote w:type=\"separator\" w:id=\"-1\"><w:p><w:pPr><w:spacing w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><\/w:pPr><w:r><w:rPr><w:rStyle w:val=\"EndnoteReference\"/><\/w:rPr><w:endnoteRef/><\/w:r><w:r><w:separator/><\/w:r><\/w:p><\/w:endnote><w:endnote w:type=\"continuationSeparator\" w:id=\"0\"><w:p><w:pPr><w:spacing w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><\/w:pPr><w:r><w:rPr><w:rStyle w:val=\"EndnoteReference\"/><\/w:rPr><w:endnoteRef/><\/w:r><w:r><w:continuationSeparator/><\/w:r><\/w:p><\/w:endnote><\/w:endnotes>", "word/footer1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:ftr xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><w:p><w:pPr><w:spacing w:before=\"0\" w:after=\"0\" w:line=\"240\" w:lineRule=\"auto\"/><w:jc w:val=\"center\"/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><w:fldChar w:fldCharType=\"begin\"/><\/w:r><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><w:instrText xml:space=\"preserve\"> PAGE <\/w:instrText><\/w:r><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><w:fldChar w:fldCharType=\"separate\"/><\/w:r><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><w:t>1<\/w:t><\/w:r><w:r><w:rPr><w:rFonts w:ascii=\"Arial\" w:hAnsi=\"Arial\" w:cs=\"Arial\"/><w:sz w:val=\"20\"/><w:szCs w:val=\"20\"/><\/w:rPr><w:fldChar w:fldCharType=\"end\"/><\/w:r><\/w:p><\/w:ftr>", "word/_rels/endnotes.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"/>", "word/_rels/document.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering\" Target=\"numbering.xml\"/><Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes\" Target=\"footnotes.xml\"/><Relationship Id=\"rId4\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes\" Target=\"endnotes.xml\"/><Relationship Id=\"rId5\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings\" Target=\"settings.xml\"/><Relationship Id=\"rId6\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments\" Target=\"comments.xml\"/><Relationship Id=\"rId7\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable\" Target=\"fontTable.xml\"/><Relationship Id=\"rIdFtr1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer\" Target=\"footer1.xml\"/><\/Relationships>", "word/_rels/comments.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"/>", "word/_rels/footnotes.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"/>", "word/_rels/fontTable.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"/>", "docProps/app.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/extended-properties\" xmlns:vt=\"http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes\"/>", "docProps/core.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><cp:coreProperties xmlns:cp=\"http://schemas.openxmlformats.org/package/2006/metadata/core-properties\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:dcmitype=\"http://purl.org/dc/dcmitype/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><dc:creator>Un-named<\/dc:creator><cp:lastModifiedBy>Un-named<\/cp:lastModifiedBy><cp:revision>1<\/cp:revision><dcterms:created xsi:type=\"dcterms:W3CDTF\">2026-10-17T16:32:41.470Z<\/dcterms:created><dcterms:modified xsi:type=\"dcterms:W3CDTF\">2026-10-17T16:32:41.474Z<\/dcterms:modified><\/cp:coreProperties>", "docProps/custom.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/custom-properties\" xmlns:vt=\"http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes\"/>", "_rels/.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" Target=\"word/document.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties\" Target=\"docProps/core.xml\"/><Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties\" Target=\"docProps/app.xml\"/><Relationship Id=\"rId4\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties\" Target=\"docProps/custom.xml\"/><\/Relationships>"}}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script>
+/* EDD converter core: one Word deed in -> two Word files out
+   (boxed "إجراء إشهار عقاري" template + landscape 556 style).
+   Works in the browser and in node (needs JSZip). */
+(function (root) {
+  'use strict';
+
+  // ---------- small helpers ----------
+  const stripTags = (x) => x.replace(/<[^>]+>/g, '');
+  const decode = (s) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const plain = (x) => decode(stripTags(x.replace(/<w:tab\/>/g, ' ').replace(/<w:br[^>]*\/>/g, ' ')));
+  const FONT = 'Arial';
+  const RF = `<w:rFonts w:ascii="${FONT}" w:hAnsi="${FONT}" w:cs="${FONT}"/>`;
+  const SZ = { 20: 20, 22: 22, 24: 24, 26: 24, 28: 26, 32: 28, 36: 30, 40: 32, 44: 34, 48: 36 };
+  const mapSz = (v) => (SZ[v] !== undefined ? SZ[v] : (v > 48 ? 36 : v));
+  const NUM = /\d+(?:\s?[\/\-]\s?\d+)+/;
+  const LATIN = /[A-Za-z][A-Za-z0-9.]*(?:\s?-\s?[0-9]+)?/;
+
+  // split xml into top-level blocks (<w:p>, <w:tbl>) of the given string
+  function topBlocks(body) {
+    const out = [];
+    const re = /<(\/?)w:(tbl|p)(?=[ >\/])[^>]*?(\/?)>/g;
+    let depth = 0, st = 0, m;
+    while ((m = re.exec(body))) {
+      const close = m[1], tag = m[2], self = m[3];
+      if (tag === 'tbl') {
+        if (!close) { if (depth === 0) st = m.index; depth++; }
+        else { depth--; if (depth === 0) out.push({ t: 'tbl', x: body.slice(st, re.lastIndex) }); }
+      } else if (depth === 0) {
+        if (!close && self) out.push({ t: 'p', x: m[0] });
+        else if (!close) st = m.index;
+        else out.push({ t: 'p', x: body.slice(st, re.lastIndex) });
+      }
+    }
+    return out;
+  }
+  // children <w:TAG> at tbl-depth 0 of an xml fragment (rows of a table, cells of a row)
+  function children(x, tag) {
+    const re = new RegExp(`<w:tbl>|</w:tbl>|<w:${tag}(?=[ >])[^>]*>|</w:${tag}>`, 'g');
+    const out = []; let tdepth = 0, st = -1, m;
+    while ((m = re.exec(x))) {
+      const s = m[0];
+      if (s === '<w:tbl>') tdepth++;
+      else if (s === '</w:tbl>') tdepth--;
+      else if (tdepth === 0) {
+        if (s.startsWith('</')) { if (st >= 0) out.push(x.slice(st, re.lastIndex)); st = -1; }
+        else st = m.index;
+      }
+    }
+    return out;
+  }
+
+  // ---------- source styles: resolve paragraph-style jc and run props ----------
+  function readStyles(stylesXml) {
+    const styles = {}; const defaults = { sz: null };
+    if (!stylesXml) return { styles, defaults };
+    const dd = stylesXml.match(/<w:rPrDefault>[\s\S]*?<\/w:rPrDefault>/);
+    if (dd) { const s = dd[0].match(/<w:sz w:val="(\d+)"/); if (s) defaults.sz = +s[1]; }
+    const re = /<w:style [^>]*w:styleId="([^"]+)"[^>]*>([\s\S]*?)<\/w:style>/g; let m;
+    while ((m = re.exec(stylesXml))) {
+      const id = m[1], x = m[2];
+      const based = (x.match(/<w:basedOn w:val="([^"]+)"/) || [])[1];
+      const jc = (x.match(/<w:pPr>[\s\S]*?<w:jc w:val="(\w+)"/) || [])[1];
+      const rpr = (x.match(/<w:rPr>[\s\S]*?<\/w:rPr>/) || [''])[0];
+      styles[id] = { raw: x, based, jc, b: /<w:b\/>|<w:b w:val="(1|true|on)"/.test(rpr), u: /<w:u w:val="(?!none)/.test(rpr), sz: +((rpr.match(/<w:sz w:val="(\d+)"/) || [])[1] || 0) || null };
+    }
+    return { styles, defaults };
+  }
+  function styleProps(st, id) {
+    const out = { jc: null, b: false, u: false, sz: null }; let guard = 0;
+    while (id && st.styles[id] && guard++ < 10) {
+      const s = st.styles[id];
+      if (!out.jc && s.jc) out.jc = s.jc;
+      if (s.b) out.b = true; if (s.u) out.u = true;
+      if (!out.sz && s.sz) out.sz = s.sz;
+      id = s.based;
+    }
+    return out;
+  }
+
+  // ---------- paragraphs ----------
+  function cleanXml(x) {
+    return x
+      .replace(/ w:rsid\w*="[^"]*"| w14:(paraId|textId)="[^"]*"/g, '')
+      .replace(/<w:proofErr [^>]*\/>|<w:bookmark(Start|End) [^>]*\/>|<w:lastRenderedPageBreak\/>|<w:noProof\/>/g, '')
+      .replace(/<w:r>(?:(?!<\/w:r>)[\s\S])*?<w:(drawing|pict|object|footnoteReference|endnoteReference|commentReference)[\s\S]*?<\/w:r>/g, '')
+      .replace(/<w:br w:type="(page|column)"\/>/g, '')
+      .replace(/<w:commentRange(Start|End) [^>]*\/>/g, '')
+      .replace(/<w:ins [^>]*>|<\/w:ins>/g, '')
+      .replace(/<w:del [^>]*>[\s\S]*?<\/w:del>/g, '')
+      .replace(/<w:hyperlink[^>]*>|<\/w:hyperlink>/g, '')
+      .replace(/<w:smartTag[^>]*>|<\/w:smartTag>|<w:smartTagPr>[\s\S]*?<\/w:smartTagPr>/g, '');
+  }
+  function fixRunProps(x, st, sp) {
+    // normalise every run: Arial, mapped size, style bold/underline
+    return x.replace(/<w:r>(<w:rPr>[\s\S]*?<\/w:rPr>)?/g, (m, rpr) => {
+      let r = rpr || '<w:rPr></w:rPr>';
+      r = r.replace(/<w:rFonts [^>]*\/>/g, '').replace(/<w:rStyle [^>]*\/>/g, '');
+      if (sp.b && !/<w:b[ \/]/.test(r)) r = r.replace('<w:rPr>', '<w:rPr><w:b/><w:bCs/>');
+      if (sp.u && !/<w:u /.test(r)) r = r.replace('</w:rPr>', '<w:u w:val="single"/></w:rPr>');
+      const def = sp.sz || st.defaults.sz || 28;
+      if (!/<w:sz /.test(r)) r = r.replace('</w:rPr>', `<w:sz w:val="${def}"/><w:szCs w:val="${def}"/></w:rPr>`);
+      else if (!/<w:szCs /.test(r)) r = r.replace(/(<w:sz w:val="(\d+)"\/>)/, '$1<w:szCs w:val="$2"/>');
+      r = r.replace(/<w:(sz|szCs) w:val="(\d+)"\/>/g, (q, a, v) => `<w:${a} w:val="${mapSz(+v)}"/>`);
+      r = r.replace('<w:rPr>', '<w:rPr>' + RF);
+      // keep schema order: rFonts, b, bCs ... ; move rtl after sz/u if present (Word tolerant, validator strict)
+      r = orderRPr(r);
+      return '<w:r>' + r;
+    });
+  }
+  const RPR_ORDER = ['rStyle', 'rFonts', 'b', 'bCs', 'i', 'iCs', 'caps', 'smallCaps', 'strike', 'dstrike', 'outline', 'shadow', 'emboss', 'imprint', 'noProof', 'snapToGrid', 'vanish', 'webHidden', 'color', 'spacing', 'w', 'kern', 'position', 'sz', 'szCs', 'highlight', 'u', 'effect', 'bdr', 'shd', 'fitText', 'vertAlign', 'rtl', 'cs', 'em', 'lang', 'eastAsianLayout', 'specVanish', 'oMath'];
+  function orderRPr(r) {
+    const inner = r.slice(7, -8);
+    const els = inner.match(/<w:(\w+)(?:\s[^>]*)?\/>|<w:(\w+)(?:\s[^>]*)?>[\s\S]*?<\/w:\2>/g) || [];
+    const seen = {};
+    const keyed = els.map((e) => { const n = e.match(/<w:(\w+)/)[1]; return { n, e, k: RPR_ORDER.indexOf(n) < 0 ? 99 : RPR_ORDER.indexOf(n) }; })
+      .filter((o) => (seen[o.n] ? false : (seen[o.n] = true)));
+    keyed.sort((a, b) => a.k - b.k);
+    return '<w:rPr>' + keyed.map((o) => o.e).join('') + '</w:rPr>';
+  }
+  function mergeRuns(x) {
+    const RUN = /<w:r>(<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?<w:t(?: xml:space="preserve")?>([^<]*)<\/w:t><\/w:r>/g;
+    return x.replace(/(?:<w:r>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?<w:t(?: xml:space="preserve")?>[^<]*<\/w:t><\/w:r>){2,}/g, (seq) => {
+      const out = []; let cur = null, m; RUN.lastIndex = 0;
+      const key = (r) => r.replace(/<w:lang [^>]*\/>/g, '');
+      while ((m = RUN.exec(seq))) {
+        const rpr = m[1] || '';
+        if (cur && key(cur[0]) === key(rpr)) cur[1] += m[2];
+        else { if (cur) out.push(cur); cur = [rpr, m[2]]; }
+      }
+      if (cur) out.push(cur);
+      return out.map(([a, b]) => `<w:r>${a}<w:t xml:space="preserve">${b}</w:t></w:r>`).join('');
+    });
+  }
+  function splitNumbers(x) {
+    // numbers like 91/148 or 2026/10/05 inside right-to-left runs -> own left-to-right run (shown as typed)
+    return x.replace(/<w:r>(<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)<w:t(?: xml:space="preserve")?>([^<]*)<\/w:t><\/w:r>/g, (m, rpr, t) => {
+      if (!rpr.includes('<w:rtl/>') || !NUM.test(t)) return m;
+      const parts = t.split(new RegExp('(' + NUM.source + ')'));
+      return parts.filter((p) => p).map((p) => NUM.test(p) && new RegExp('^' + NUM.source + '$').test(p)
+        ? `<w:r>${rpr.replace('<w:rtl/>', '')}<w:t xml:space="preserve">${p}</w:t></w:r>`
+        : `<w:r>${rpr}<w:t xml:space="preserve">${p}</w:t></w:r>`).join('');
+    });
+  }
+  function wantDashes(textTrim, jc) {
+    if (!textTrim) return false;
+    if (['center', 'start', 'end', 'right', 'left'].includes(jc)) return false;
+    if (/-{3,}$/.test(textTrim)) return true;
+    if (textTrim.length < 60) return false;
+    return textTrim.endsWith('.') || /(أدناه|ادناه|أدنـ+اه|يلي\s*:|التالية\s*:)$/.test(textTrim);
+  }
+  function addDashes(p, tabPos) {
+    // strip typed trailing dashes, then a tab with a "-----" leader to the end of the line
+    const runs = [...p.matchAll(/<w:r>(?:(?!<w:r>)[\s\S])*?<\/w:r>/g)];
+    let lastRpr = '';
+    for (let i = runs.length - 1; i >= 0; i--) {
+      const r = runs[i][0];
+      const tm = r.match(/(<w:t(?: [^>]*)?>)([^<]*)(<\/w:t>)/);
+      if (!tm) continue;
+      if (!lastRpr) { const rp = r.match(/<w:rPr>[\s\S]*?<\/w:rPr>/); lastRpr = rp ? rp[0] : ''; }
+      if (/-\s*$/.test(tm[2])) {
+        const nt = tm[2].replace(/[\s\-]*-[\s\-]*$/, '');
+        const r2 = r.replace(tm[0], tm[1] + nt + tm[3]);
+        p = p.slice(0, runs[i].index) + r2 + p.slice(runs[i].index + r.length);
+        if (nt.trim()) break;
+        continue;
+      }
+      break;
+    }
+    let rp = lastRpr || '<w:rPr><w:rtl/></w:rPr>';
+    if (!rp.includes('<w:rtl/>')) rp = orderRPr(rp.replace('</w:rPr>', '<w:rtl/></w:rPr>'));
+    p = p.slice(0, p.lastIndexOf('</w:p>')) + `<w:r>${rp}<w:tab/></w:r></w:p>`;
+    return p.replace('<w:pPr>', `<w:pPr><w:tabs><w:tab w:val="left" w:leader="hyphen" w:pos="${tabPos}"/></w:tabs>`);
+  }
+  function convertParagraph(x, st, mode) {
+    x = cleanXml(x);
+    const pm = x.match(/^<w:p(?: [^>]*)?>(<w:pPr>[\s\S]*?<\/w:pPr>)?/);
+    const ppr = pm[1] || '';
+    const pstyle = (ppr.match(/<w:pStyle w:val="([^"]+)"/) || [])[1];
+    const sp = styleProps(st, pstyle || 'Normal');
+    let jc = (ppr.match(/<w:jc w:val="(\w+)"\/>/) || [])[1] || sp.jc || 'both';
+    if (/kashida|distribute|thaiDistribute/i.test(jc)) jc = 'both';
+    let markRpr = (ppr.match(/<w:rPr>[\s\S]*?<\/w:rPr>/) || [''])[0];
+    if (markRpr) markRpr = orderRPr(markRpr.replace(/<w:rFonts [^>]*\/>|<w:rStyle [^>]*\/>|<w:ins [^>]*\/>|<w:del [^>]*\/>/g, '').replace(/<w:(sz|szCs) w:val="(\d+)"\/>/g, (q, a, v) => `<w:${a} w:val="${mapSz(+v)}"/>`));
+    let body = x.slice(pm[0].length);
+    // dashes already added to this paragraph before (a tab at its end): remove them, they are added again once below
+    body = body.replace(/(?:<w:r>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?<w:tab\/><\/w:r>\s*)+<\/w:p>$/, '</w:p>');
+    body = fixRunProps(body, st, sp);
+    body = mergeRuns(body);
+    body = splitNumbers(body);
+    const ind = mode === 's556' ? 2552 : 0;
+    let p = `<w:p><w:pPr><w:bidi/><w:spacing w:before="0" w:after="0" w:line="276" w:lineRule="auto"/><w:ind w:start="${ind}" w:end="0"/><w:jc w:val="${jc}"/>${markRpr}</w:pPr>` + body;
+    const t = plain(p).replace(/\s+$/, '');
+    if (wantDashes(t, jc)) p = addDashes(p, mode === 's556' ? 13990 : 6690);
+    return p;
+  }
+
+  // ---------- tables -> logical rows ----------
+  function tableRows(tblXml, items) {
+    const bidi = /<w:tblPr>[\s\S]*?<w:bidiVisual\/>[\s\S]*?<\/w:tblPr>/.test(tblXml.slice(0, 2000)) && tblXml.slice(0, 2000).indexOf('<w:bidiVisual/>') < tblXml.slice(0, 2000).indexOf('</w:tblPr>');
+    const grid = [...(tblXml.match(/<w:tblGrid>[\s\S]*?<\/w:tblGrid>/) || [''])[0].matchAll(/<w:gridCol w:w="(\d+)"/g)].map((m) => +m[1]);
+    const gx = [0]; grid.forEach((g) => gx.push(gx[gx.length - 1] + g));
+    const total = gx[gx.length - 1] || 1;
+    const inner = tblXml.slice(tblXml.indexOf('>') + 1, tblXml.lastIndexOf('</w:tbl>'));
+    for (const r of children(inner, 'tr')) {
+      const cellsX = children(r.slice(r.indexOf('>') + 1, r.lastIndexOf('</w:tr>')), 'tc');
+      if (/<w:tbl>/.test(r)) {
+        // container row: its own text first (titles), then nested tables
+        for (const c of cellsX) {
+          for (const b of topBlocks(c.slice(c.indexOf('</w:tcPr>') >= 0 ? c.indexOf('</w:tcPr>') + 9 : 6, c.lastIndexOf('</w:tc>')))) {
+            if (b.t === 'tbl') tableRows(b.x, items);
+            else { const t = plain(b.x).trim(); if (t) items.push({ t: 'title', text: t }); }
+          }
+        }
+        continue;
+      }
+      let col = +((r.match(/<w:gridBefore w:val="(\d+)"/) || [])[1] || 0);
+      const cells = [];
+      for (const c of cellsX) {
+        const span = +((c.match(/<w:gridSpan w:val="(\d+)"/) || [])[1] || 1);
+        const vm = c.match(/<w:vMerge(?: w:val="(\w+)")?\/>/);
+        const paras = c.match(/<w:p[ >][\s\S]*?<\/w:p>/g) || [];
+        const text = paras.map((p) => plain(p).replace(/\s+/g, ' ').trim()).filter((s) => s).join(' ');
+        let a = gx[Math.min(col, grid.length)] ?? total, b = gx[Math.min(col + span, grid.length)] ?? total;
+        if (!bidi) { const a2 = total - b, b2 = total - a; a = a2; b = b2; }   // measure from the right edge
+        cells.push({ text, a: a / total, b: b / total, cont: !!(vm && vm[1] !== 'restart') });
+        col += span;
+      }
+      cells.sort((p, q) => p.a - q.a);
+      items.push({ t: 'row', cells });
+    }
+  }
+  const isNum = (s) => /^[\d\s.,\/\-]+$/.test(s) && /\d/.test(s);
+  const rowKind = (cells) => {
+    const ne = cells.filter((c) => c.text);
+    const all = ne.map((c) => c.text).join(' ');
+    if (/المجموع|مجموع/.test(all) && ne.some((c) => isNum(c.text))) return 'total';
+    if (ne.length >= 3 && ne.filter((c) => isNum(c.text)).length === 0) return 'head';
+    if (ne.length <= 2 && !ne.some((c) => isNum(c.text) && ne.length === 1)) return ne.length ? 'title' : 'empty';
+    return 'data';
+  };
+  function buildHeader(headRows) {
+    // columns = cells of the last header row; a wider cell above adds its text on top
+    const last = headRows[headRows.length - 1];
+    const cols = last.cells.map((c) => ({ a: c.a, b: c.b, text: c.text }));
+    for (let k = headRows.length - 2; k >= 0; k--) {
+      for (const up of headRows[k].cells) {
+        if (!up.text) continue;
+        const covered = cols.filter((c) => c.a >= up.a - 0.005 && c.b <= up.b + 0.005);
+        if (covered.length === 1 && !covered[0].text) covered[0].text = up.text;
+        else if (covered.length > 1) covered.forEach((c) => { if (!c.text.includes(up.text)) c.text = up.text + ' ' + c.text; });
+      }
+    }
+    // columns that are only spacing (no text, very narrow) are dropped
+    return cols.filter((c) => c.text || c.b - c.a > 0.03);
+  }
+  function mapRow(cells, cols, prev) {
+    return cols.map((col, i) => {
+      let best = null, bo = 0;
+      for (const c of cells) {
+        const o = Math.min(c.b, col.b) - Math.max(c.a, col.a);
+        if (o > bo + 1e-6) { bo = o; best = c; }
+      }
+      if (!best) return '';
+      if (best.cont && !best.text && prev) return prev[i];
+      return best.text;
+    });
+  }
+
+  // ---------- table output ----------
+  function runsFor(t, sz, bold) {
+    const base = RF + (bold ? '<w:b/><w:bCs/>' : '') + `<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/>`;
+    const re = new RegExp('(' + NUM.source + '|' + LATIN.source + ')');
+    return t.split(re).filter((s) => s).map((s) => {
+      const ltr = new RegExp('^(?:' + NUM.source + '|' + LATIN.source + ')$').test(s);
+      return `<w:r><w:rPr>${base}${ltr ? '' : '<w:rtl/>'}</w:rPr><w:t xml:space="preserve">${esc(s)}</w:t></w:r>`;
+    }).join('');
+  }
+  function titlePara(text, mode) {
+    const ind = mode === 's556' ? 2552 : 0;
+    return `<w:p><w:pPr><w:bidi/><w:spacing w:before="0" w:after="0" w:line="276" w:lineRule="auto"/><w:ind w:start="${ind}" w:end="0"/><w:jc w:val="center"/></w:pPr>${runsFor(text, 26, true)}</w:p>`;
+  }
+  function colWidths(cols, W) {
+    const wts = cols.map((c) => /طبيعة|التعيين|وصف|الوصف|البيان|تتكون|تشتمل/.test(c.text) ? 4 : /المساحة|مساحة/.test(c.text) ? 1.45 : /الطابق|المستوى/.test(c.text) ? 1.4 : /المشترك|الأجزاء|الاجزاء|نسبة/.test(c.text) ? 1.15 : 1);
+    const s = wts.reduce((a, b) => a + b, 0);
+    const w = wts.map((x) => Math.floor((W * x) / s));
+    w[w.length - 1] += W - w.reduce((a, b) => a + b, 0);
+    return w;
+  }
+  function makeTable(head, rows, mode, showHead) {
+    const W = mode === 's556' ? 13000 : 6600;
+    const cols = head.cols; const w = colWidths(cols, W);
+    const areaIdx = cols.map((c, i) => (/المساحة|مساحة/.test(c.text) ? i : -1)).filter((i) => i >= 0);
+    const descIdx = cols.findIndex((c) => /طبيعة|التعيين|وصف|الوصف|البيان/.test(c.text));
+    const S = mode === 's556'
+      ? { body: 24, head: 22, mar: '<w:tcMar><w:top w:w="150" w:type="dxa"/><w:start w:w="80" w:type="dxa"/><w:bottom w:w="150" w:type="dxa"/><w:end w:w="80" w:type="dxa"/></w:tcMar>', shade: true }
+      : { body: 15, head: 15, mar: '', shade: false };
+    const BORD = '<w:tcBorders><w:top w:val="single" w:sz="4" w:space="0" w:color="000000"/><w:start w:val="single" w:sz="4" w:space="0" w:color="000000"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="000000"/><w:end w:val="single" w:sz="4" w:space="0" w:color="000000"/></w:tcBorders>';
+    const cell = (width, text, opt = {}) => {
+      const pr = `<w:tcW w:w="${width}" w:type="dxa"/>` + (opt.span > 1 ? `<w:gridSpan w:val="${opt.span}"/>` : '') + BORD +
+        (opt.shade && S.shade ? '<w:shd w:val="clear" w:color="auto" w:fill="D9D9D9"/>' : '') + S.mar + '<w:vAlign w:val="center"/>';
+      const sz = opt.bold ? S.head : S.body;
+      return `<w:tc><w:tcPr>${pr}</w:tcPr><w:p><w:pPr><w:bidi/><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/><w:ind w:start="0" w:end="0"/><w:jc w:val="${opt.jc || 'center'}"/></w:pPr>${text ? runsFor(text, sz, opt.bold) : ''}</w:p></w:tc>`;
+    };
+    const TR = '<w:tr><w:trPr><w:cantSplit/><w:jc w:val="center"/></w:trPr>';
+    let out = `<w:tbl><w:tblPr><w:bidiVisual/><w:tblW w:w="${W}" w:type="dxa"/><w:jc w:val="center"/><w:tblLayout w:type="fixed"/>` +
+      `<w:tblCellMar><w:top w:w="0" w:type="dxa"/><w:start w:w="30" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:end w:w="30" w:type="dxa"/></w:tblCellMar></w:tblPr>` +
+      `<w:tblGrid>${w.map((x) => `<w:gridCol w:w="${x}"/>`).join('')}</w:tblGrid>`;
+    if (showHead) out += TR + cols.map((c, i) => cell(w[i], c.text, { bold: true, shade: true })).join('') + '</w:tr>';
+    const addM2 = (v) => (v && isNum(v) && !/م/.test(v) ? v + ' م²' : v);
+    for (const r of rows) {
+      if (r.kind === 'total') {
+        const vals = r.vals;
+        let first = vals.findIndex((v) => isNum(v)); if (first < 1) first = Math.max(1, cols.length - 4);
+        const label = vals.slice(0, first).filter((v) => v && !isNum(v)).join(' ') || 'المجموع';
+        out += TR + cell(w.slice(0, first).reduce((a, b) => a + b, 0), label, { span: first, bold: true, shade: true }) +
+          vals.slice(first).map((v, k) => cell(w[first + k], areaIdx.includes(first + k) ? addM2(v) : v, { bold: true, shade: true })).join('') + '</w:tr>';
+      } else {
+        out += TR + r.vals.map((v, i) => cell(w[i], areaIdx.includes(i) ? addM2(v) : v, { jc: i === descIdx ? 'both' : 'center' })).join('') + '</w:tr>';
+      }
+    }
+    return out + '</w:tbl>';
+  }
+  // turn the logical items (titles / header rows / data rows) into output xml
+  function renderTableItems(items, mode, state) {
+    let out = ''; let rows = []; let headRows = []; let showHead = false;
+    const flush = () => {
+      if (rows.length && state.head) out += makeTable(state.head, rows, mode, showHead);
+      else if (rows.length) {  // no header known: plain table with the row cells as they are
+        const n = Math.max(...rows.map((r) => r.vals.length));
+        const cols = Array.from({ length: n }, () => ({ text: '' }));
+        out += makeTable({ cols }, rows.map((r) => ({ ...r, vals: [...r.vals, ...Array(n - r.vals.length).fill('')] })), mode, false);
+      }
+      rows = []; showHead = false;
+    };
+    for (const it of items) {
+      if (it.t === 'title') { flush(); out += titlePara(it.text, mode); continue; }
+      const kind = rowKind(it.cells);
+      if (kind === 'empty') continue;
+      if (kind === 'head') {
+        if (rows.length) flush();
+        headRows.push(it); state.head = { cols: buildHeader(headRows) }; showHead = true; state.prev = null; continue;
+      }
+      headRows = [];
+      if (kind === 'title') {
+        flush();
+        const t = it.cells.filter((c) => c.text).map((c) => c.text).join(' ');
+        // "القسم 27 مجموعة الملكية 155العمارة 92" -> two title lines
+        const m = t.match(/^(.*?\d)\s*(العمارة\s*\d.*|المدخل\s*\d.*|البرج\s*\d.*)$/);
+        if (m && m[1].length > 3) { out += titlePara(m[1].trim(), mode) + titlePara(m[2].trim(), mode); } else out += titlePara(t, mode);
+        continue;
+      }
+      const vals = state.head ? mapRow(it.cells, state.head.cols, state.prev) : it.cells.map((c) => c.text);
+      if (kind === 'data') state.prev = vals;
+      rows.push({ kind, vals });
+      if (kind === 'total') { flush(); state.prev = null; }
+    }
+    flush();
+    return out;
+  }
+
+  // ---------- detection of the cadastral box values ----------
+  function detectBox(text) {
+    const uniq = (arr) => [...new Set(arr)];
+    const qism = uniq([...text.matchAll(/(?:^|[\s(])(?:ال)?قسم\s*(?:رقم)?\s*[:：]?\s*(\d{1,4})(?!\d)/g)].map((m) => +m[1] + '')).map((v) => v.padStart(2, '0'));
+    const maj = uniq([...text.matchAll(/مجموع[ةه]\s+(?:ال)?ملكي[ةه]\s*(?:رقم)?\s*[:：]?\s*(\d{1,5})/g)].map((m) => m[1]));
+    const freq = (re, stop) => {
+      const c = {};
+      for (const m of text.matchAll(re)) {
+        const words = []; for (const w of m[1].split(/\s+/)) { if (!w || stop.test(w)) break; words.push(w); if (words.length >= 2) break; }
+        const k = words.join(' ').replace(/^و(?=ال)/, '');
+        const near = /قسم|مجموع[ةه] (?:ال)?ملكي|مسح|المسمى|واقع/.test(text.slice(Math.max(0, m.index - 250), m.index + 250));
+        if (k) c[k] = (c[k] || 0) + (near ? 5 : 1);
+      }
+      return Object.entries(c).sort((x, y) => y[1] - x[1])[0]?.[0] || '';
+    };
+    const STOP = /^(بتاري|دائرة|ولاي|وولاي|الكائن|رقم|قسم|حي|مسجل|المؤرخ|الموافق)/;
+    const bal = freq(/بلدي[ةه]\s*[:：]?\s*([^،,.:()\-0-9\n]{2,60})/g, STOP);
+    const wil = freq(/ولاي[ةه]\s*[:：]?\s*([^،,.:()\-0-9\n]{2,40})/g, /^(بتاري|دائرة|بلدي|الكائن|رقم|قسم|حي|المؤرخ|تحت|المسجل)/);
+    return {
+      qism: qism.slice(0, 6).join(' و '),
+      majmoua: maj.slice(0, 20).join('، '),
+      baladiya: bal, wilaya: wil,
+    };
+  }
+
+  // ---------- main ----------
+  async function analyse(JSZip, buf) {
+    const zip = await JSZip.loadAsync(buf);
+    const f = zip.file('word/document.xml');
+    if (!f) throw new Error('NOT_DOCX');
+    let doc = await f.async('string');
+    const stylesXml = zip.file('word/styles.xml') ? await zip.file('word/styles.xml').async('string') : '';
+    const themeF = Object.keys(zip.files).find((n) => /^word\/theme\/theme\d*\.xml$/.test(n));
+    const themeXml = themeF ? await zip.file(themeF).async('string') : '';
+    let body = doc.slice(doc.indexOf('<w:body>') + 8, doc.lastIndexOf('<w:sectPr') > 0 ? doc.lastIndexOf('<w:sectPr') : doc.lastIndexOf('</w:body>'));
+    let boxed = false;
+    // a file already in the box template: take only what is inside the big box
+    const bh = [...doc.matchAll(/<w:trHeight w:val="(2000|9300)"/g)];
+    if (bh.length && /إطار مخصص للمحافظ/.test(stripTags(doc))) {
+      const rowI = bh[0].index;
+      const tc1 = doc.indexOf('<w:tc>', rowI), tc2 = doc.indexOf('<w:tc>', tc1 + 5);
+      const s = doc.indexOf('</w:tcPr>', tc2) + 9, e = doc.lastIndexOf('</w:tc></w:tr></w:tbl>');
+      if (tc2 > 0 && e > s) { body = doc.slice(s, e); boxed = true; }
+    }
+    const blocks = topBlocks(body);
+    const text = blocks.map((b) => plain(b.x)).join('\n');
+    return { zip, doc, stylesXml, themeXml, blocks, boxed, box: detectBox(text), text };
+  }
+
+
+  // the file's own fonts (theme fonts written out by name), used for runs in kept tables
+  function readFonts(stylesXml, themeXml) {
+    const theme = {};
+    for (const k of ['major', 'minor']) {
+      const blk = (themeXml.match(new RegExp(`<a:${k}Font>[\\s\\S]*?</a:${k}Font>`)) || [''])[0];
+      theme[k + 'Latin'] = (blk.match(/<a:latin typeface="([^"]*)"/) || [])[1] || '';
+      theme[k + 'Cs'] = (blk.match(/<a:cs typeface="([^"]*)"/) || [])[1] || '';
+    }
+    const res = (name) => {
+      if (!name) return '';
+      const k = name.startsWith('major') ? 'major' : 'minor';
+      return /Bidi/.test(name) ? (theme[k + 'Cs'] || theme[k + 'Latin']) : theme[k + 'Latin'];
+    };
+    const dd = ((stylesXml || '').match(/<w:rPrDefault>[\s\S]*?<\/w:rPrDefault>/) || [''])[0];
+    const rf = (dd.match(/<w:rFonts [^>]*\/>/) || [''])[0];
+    const at = (a) => (rf.match(new RegExp(`w:${a}="([^"]*)"`)) || [])[1];
+    const ascii = at('ascii') || res(at('asciiTheme')) || 'Times New Roman';
+    const cs = at('cs') || res(at('cstheme')) || ascii;
+    return { ascii, cs, res };
+  }
+  function explicitFonts(r, fonts) {
+    // <w:rFonts> with names only (no theme references), so the table looks the same in the new file
+    const m = r.match(/<w:rFonts [^>]*\/>/);
+    const at = (a) => m && (m[0].match(new RegExp(`w:${a}="([^"]*)"`)) || [])[1];
+    const ascii = at('ascii') || fonts.res(at('asciiTheme')) || fonts.ascii;
+    const hAnsi = at('hAnsi') || fonts.res(at('hAnsiTheme')) || ascii;
+    const cs = at('cs') || fonts.res(at('cstheme')) || fonts.cs;
+    const el = `<w:rFonts w:ascii="${esc(ascii)}" w:hAnsi="${esc(hAnsi)}" w:cs="${esc(cs)}"/>`;
+    return m ? r.replace(m[0], el) : r.replace('<w:rPr>', '<w:rPr>' + el);
+  }
+
+  // ---------- tables kept exactly as in the file; only made narrower when wider than the page/box ----------
+  function keepTable(x, W, st) {
+    x = cleanXml(x).replace(/<w:numPr>[\s\S]*?<\/w:numPr>/g, '');
+    // borders/cell margins that came from the file's table style are written into the table itself
+    const ts = (x.match(/<w:tblStyle w:val="([^"]+)"/) || [])[1];
+    if (ts) {
+      let id = ts, raw = '', g = 0;
+      while (id && st.styles[id] && g++ < 10) { raw = st.styles[id].raw + raw; id = st.styles[id].based; }
+      const bord = (raw.match(/<w:tblBorders>[\s\S]*?<\/w:tblBorders>/) || [])[0];
+      const mar = (raw.match(/<w:tblCellMar>[\s\S]*?<\/w:tblCellMar>/) || [])[0];
+      x = x.replace(/<w:tblPr>([\s\S]*?)<\/w:tblPr>/, (m, inner) => {
+        inner = inner.replace(/<w:tblStyle [^>]*\/>/, '');
+        const ORDER = ['tblStyle', 'tblpPr', 'tblOverlap', 'bidiVisual', 'tblStyleRowBandSize', 'tblStyleColBandSize', 'tblW', 'jc', 'tblCellSpacing', 'tblInd', 'tblBorders', 'shd', 'tblLayout', 'tblCellMar', 'tblLook'];
+        const add = (name, el) => {
+          if (!el || inner.includes('<w:' + name)) return;
+          const k = ORDER.indexOf(name);
+          const after = ORDER.slice(k + 1).map((n) => inner.indexOf('<w:' + n)).filter((i) => i >= 0);
+          const pos = after.length ? Math.min(...after) : inner.length;
+          inner = inner.slice(0, pos) + el + inner.slice(pos);
+        };
+        add('tblBorders', bord); add('tblCellMar', mar);
+        return '<w:tblPr>' + inner + '</w:tblPr>';
+      });
+    }
+    // paragraphs in cells: alignment / size that came from the file's styles
+    x = x.replace(/<w:p(?: [^>]*)?>(<w:pPr>[\s\S]*?<\/w:pPr>)?([\s\S]*?)<\/w:p>/g, (m, ppr, rest) => {
+      const id = ((ppr || '').match(/<w:pStyle w:val="([^"]+)"/) || [])[1] || 'Normal';
+      const sp = styleProps(st, id);
+      let p = ppr || '<w:pPr></w:pPr>';
+      p = p.replace(/<w:pStyle [^>]*\/>/, '');
+      if (sp.jc && !/<w:jc /.test(p)) p = p.replace(/(<w:rPr>|<\/w:pPr>)/, `<w:jc w:val="${sp.jc}"/>$1`);
+      const def = sp.sz || st.defaults.sz;
+      rest = rest.replace(/<w:r>(<w:rPr>[\s\S]*?<\/w:rPr>)?/g, (q, r) => {
+        r = r || '<w:rPr></w:rPr>';
+        r = orderRPr(explicitFonts(r, st.fonts));
+        if (!def) return '<w:r>' + r;
+        if (!/<w:sz /.test(r)) r = orderRPr(r.replace('</w:rPr>', `<w:sz w:val="${def}"/><w:szCs w:val="${def}"/></w:rPr>`));
+        if (sp.b && !/<w:b[ \/]/.test(r)) r = orderRPr(r.replace('</w:rPr>', '<w:b/><w:bCs/></w:rPr>'));
+        return '<w:r>' + r;
+      });
+      return '<w:p>' + p + rest + '</w:p>';
+    });
+    // width: the real width is the largest of the grid, the table width and the widest row of cells
+    const dxa = (re) => [...x.matchAll(re)].map((m) => +m[1]);
+    const gridBlock = (x.match(/<w:tblGrid>[\s\S]*?<\/w:tblGrid>/) || [''])[0];
+    let grid = [...gridBlock.matchAll(/<w:gridCol w:w="(\d+)"/g)].map((m) => +m[1]);
+    const outerRows = children(x.slice(x.indexOf('>') + 1, x.lastIndexOf('</w:tbl>')), 'tr');
+    let rowMax = 0, bestRow = null;
+    for (const r of outerRows) {
+      const cs = children(r.slice(r.indexOf('>') + 1, r.lastIndexOf('</w:tr>')), 'tc');
+      const ws = cs.map((c) => +((c.match(/<w:tcW (?:w:w="(\d+)" w:type="dxa"|w:type="dxa" w:w="(\d+)")/) || []).slice(1).find((v) => v) || 0));
+      const sum = ws.reduce((p, q) => p + q, 0);
+      if (sum > rowMax) rowMax = sum;
+      if (!bestRow && cs.length === grid.length && ws.every((w) => w > 0) && !cs.some((c) => /<w:gridSpan/.test(c))) bestRow = ws;
+    }
+    const gsum = grid.reduce((p, q) => p + q, 0);
+    // a grid that does not match the cells (files saved by other programs): take the widths from the cells
+    if (bestRow && Math.abs(bestRow.reduce((p, q) => p + q, 0) - gsum) > gsum * 0.05) {
+      grid = bestRow;
+      x = x.replace(gridBlock, '<w:tblGrid>' + grid.map((g) => `<w:gridCol w:w="${g}"/>`).join('') + '</w:tblGrid>');
+    }
+    const tblW = (x.slice(0, x.indexOf('</w:tblPr>')).match(/<w:tblW (?:w:w="(\d+)" w:type="dxa"|w:type="dxa" w:w="(\d+)")/) || []).slice(1).find((v) => v);
+    const tw = Math.max(grid.reduce((p, q) => p + q, 0), +(tblW || 0), rowMax);
+    const f = tw > W ? W / tw : 1;
+    if (f < 1) {
+      const sc = (v) => Math.max(1, Math.round(+v * f));
+      x = x.replace(/<w:gridCol w:w="(\d+)"/g, (m, v) => `<w:gridCol w:w="${sc(v)}"`)
+        .replace(/<w:(tcW|tblW|wBefore|wAfter) w:w="(\d+)" w:type="dxa"\/>/g, (m, n, v) => `<w:${n} w:w="${sc(v)}" w:type="dxa"/>`)
+        .replace(/<w:(tcW|tblW|wBefore|wAfter) w:type="dxa" w:w="(\d+)"\/>/g, (m, n, v) => `<w:${n} w:type="dxa" w:w="${sc(v)}"/>`)
+        // the same table, just smaller: text and cell padding shrink with the columns so words do not break
+        .replace(/<w:(sz|szCs) w:val="(\d+)"\/>/g, (m, n, v) => `<w:${n} w:val="${Math.max(14, Math.round(+v * f))}"/>`)
+        .replace(/(<w:(?:tcMar|tblCellMar)>[\s\S]*?<\/w:(?:tcMar|tblCellMar)>)/g, (m) => m.replace(/w:w="(\d+)"/g, (q, v) => `w:w="${sc(v)}"`));
+    }
+    // widths are fixed so Word keeps the columns as they are instead of re-fitting them
+    x = x.replace(/<w:tblLayout [^>]*\/>/, '');
+    x = x.replace(/<w:tblPr>([\s\S]*?)<\/w:tblPr>/, (m, inner) => {
+      const after = ['tblCellMar', 'tblLook', 'tblCaption', 'tblDescription'].map((n) => inner.indexOf('<w:' + n)).filter((i) => i >= 0);
+      const pos = after.length ? Math.min(...after) : inner.length;
+      return '<w:tblPr>' + inner.slice(0, pos) + '<w:tblLayout w:type="fixed"/>' + inner.slice(pos) + '</w:tblPr>';
+    });
+    x = x.replace(/<w:tblInd w:w="-?\d+" w:type="dxa"\/>/, '<w:tblInd w:w="0" w:type="dxa"/>');
+    x = x.replace(/<w:tblpPr [^>]*\/>/g, '');   // floating tables stay in the flow
+    return x;
+  }
+
+  function buildContent(a, mode) {
+    const st = readStyles(a.stylesXml); st.fonts = readFonts(a.stylesXml, a.themeXml);
+    let out = ''; const stats = { paras: 0, tables: 0, rows: 0, dashes: 0 };
+    const state = { head: null, prev: null };
+    let pendingItems = [];
+    const flushItems = () => { if (pendingItems.length) { out += renderTableItems(pendingItems, mode, state); pendingItems = []; } };
+    const W = mode === 's556' ? 14004 : 6698;
+    const gap = '<w:p><w:pPr><w:bidi/><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr></w:p>';
+    let lastWasTable = false;
+    for (const b of a.blocks) {
+      if (b.t === 'tbl') {
+        if (lastWasTable) out += gap;       // two tables never stick together
+        out += keepTable(b.x, W, st);
+        stats.tables++; stats.rows += (b.x.match(/<w:tr[ >]/g) || []).length;
+        lastWasTable = true;
+        continue;
+      }
+      const t = plain(b.x).trim();
+      if (!t || /^[\s\-_ـ.:]*$/.test(t)) continue;   // no empty lines, and no lines made only of dashes
+      // a short centred title between two tables keeps the table context (header shown once per building)
+      flushItems();
+      const p = convertParagraph(b.x, st, mode);
+      if (p.includes('w:leader="hyphen"')) stats.dashes++;
+      out += p; stats.paras++; lastWasTable = false;
+    }
+    flushItems();
+    return { xml: out, stats };
+  }
+
+  async function zipFrom(JSZip, files, replaceDoc) {
+    const z = new JSZip();
+    for (const [name, content] of Object.entries(files)) z.file(name, name === 'word/document.xml' ? replaceDoc : content);
+    return z.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
+  }
+
+  async function convert(JSZip, a, shells, box) {
+    const endP = '<w:p><w:pPr><w:bidi/><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr></w:p>';
+    const t = buildContent(a, 'tpl');
+    const v = (s, d) => esc((s || '').trim()) || d;
+    let tdoc = shells.tpl['word/document.xml']
+      .replace('{{CONTENT}}', t.xml + endP)
+      .replace('{{QISM}}', v(box.qism, '')).replace('{{BALADIYA}}', v(box.baladiya, '')).replace('{{MAJMOUA}}', v(box.majmoua, ''))
+      .replace('{{HISSA}}', v(box.hissa, '')).replace('{{WILAYA}}', v(box.wilaya, '..............'))
+      // إيداع / في / مجلد / رسم: the value when typed, otherwise the dotted line of the form
+      .replace('{{IDA_HAJM}}', v(box.idaHajm, '..................')).replace('{{IDA_RAQM}}', v(box.idaRaqm, '..................'))
+      .replace('{{FI}}', v(box.fi, '..............................................'))
+      .replace('{{MUJALLAD}}', v(box.mujallad, '...................')).replace('{{MUJ_RAQM}}', v(box.mujRaqm, '...................'))
+      .replace('{{RASM}}', v(box.rasm, ''));
+    const s = shells.s556 ? buildContent(a, 's556') : null;
+    const sdoc = s ? shells.s556['word/document.xml'].replace('{{BODY}}', s.xml + endP) : null;
+    return {
+      template: await zipFrom(JSZip, shells.tpl, tdoc),
+      s556: s ? await zipFrom(JSZip, shells.s556, sdoc) : null,
+      stats: t.stats,
+    };
+  }
+
+  root.EDD = { analyse, convert, detectBox };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+/* 556 version: Word file whose tables are scanned pictures -> the same Word file with the
+   pictures replaced by real typed tables (EDD_Ilot556 table style), landscape page.
+   Reading the pictures is done by the page (Claude via the sample capability); this file
+   finds the pictures, prepares the request and builds the Word file from the answers. */
+(function (root) {
+  'use strict';
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const stripTags = (x) => x.replace(/<[^>]+>/g, '');
+  const NUM = /[\d?]*\d[\d?]*(?:[.,][\d?]+)*(?:\s?[\/\-]\s?[\d?]+(?:[.,][\d?]+)*)*/;
+  const LATIN = /[A-Za-z][A-Za-z0-9.]*(?:\s?-\s?[0-9]+)?/;
+
+  function topBlocks(body) {
+    const out = []; const re = /<(\/?)w:(tbl|p)(?=[ >\/])[^>]*?(\/?)>/g; let depth = 0, st = 0, m;
+    while ((m = re.exec(body))) {
+      const close = m[1], tag = m[2], self = m[3];
+      if (tag === 'tbl') {
+        if (!close) { if (depth === 0) st = m.index; depth++; } else { depth--; if (depth === 0) out.push({ t: 'tbl', x: body.slice(st, re.lastIndex) }); }
+      } else if (depth === 0) {
+        if (!close && self) out.push({ t: 'p', x: m[0] });
+        else if (!close) st = m.index;
+        else out.push({ t: 'p', x: body.slice(st, re.lastIndex) });
+      }
+    }
+    return out;
+  }
+
+  // ---------- 1. find the scanned pictures ----------
+  async function analyse(JSZip, buf) {
+    const zip = await JSZip.loadAsync(buf);
+    const f = zip.file('word/document.xml'); if (!f) throw new Error('NOT_DOCX');
+    const doc = await f.async('string');
+    const relsXml = zip.file('word/_rels/document.xml.rels') ? await zip.file('word/_rels/document.xml.rels').async('string') : '';
+    const rels = {};
+    for (const m of relsXml.matchAll(/<Relationship [^>]*?Id="([^"]+)"[^>]*?Target="([^"]+)"[^>]*?\/?>/g)) rels[m[1]] = m[2];
+    for (const m of relsXml.matchAll(/<Relationship [^>]*?Target="([^"]+)"[^>]*?Id="([^"]+)"[^>]*?\/?>/g)) rels[m[2]] = rels[m[2]] || m[1];
+    const bStart = doc.indexOf('<w:body>') + 8;
+    const lastSect = doc.lastIndexOf('<w:sectPr');
+    const body = doc.slice(bStart, lastSect > 0 ? lastSect : doc.lastIndexOf('</w:body>'));
+    const blocks = topBlocks(body);
+    const images = [];
+    blocks.forEach((b, i) => {
+      if (b.t !== 'p') return;
+      const ids = [...b.x.matchAll(/<a:blip [^>]*r:embed="([^"]+)"|<v:imagedata [^>]*r:id="([^"]+)"/g)].map((m) => m[1] || m[2]);
+      for (const id of ids) {
+        const target = rels[id]; if (!target) continue;
+        const path = target.startsWith('/') ? target.slice(1) : 'word/' + target.replace(/^\.\//, '');
+        const ext = (path.split('.').pop() || '').toLowerCase();
+        images.push({ block: i, rid: id, path, ext, ok: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'].includes(ext) });
+      }
+    });
+    return { zip, doc, body, bStart, blocks, images };
+  }
+
+  // ---------- 2. the request sent with each picture ----------
+  function prompt(prev, nImages, pdfText) {
+    return [
+      'You are copying a scanned page from an Algerian notarial deed (Arabic, right-to-left) into structured data, so it can be rebuilt as an editable Word page that looks exactly like the scan.',
+      nImages > 1
+        ? `Image 1 is the WHOLE page: use it for the layout (which cells are merged, where each table starts and ends). Images 2 to ${nImages} are zoomed horizontal bands of the same page, top to bottom, overlapping a little: use them to read small text and digits exactly. Every row must appear ONCE.`
+        : 'The image is the whole page.',
+      'Copy EXACTLY what is printed. Never correct, compute, translate, reorder, add or drop anything. Keep every row, including every total row (المجموع الجزئي, المجموع الكلي, المجموع...).',
+      'Digits: Western 0-9, exactly as printed, keeping leading zeros ("03", "07"), decimal commas, slashes and dashes ("78,57", "1000/1", "F3-01", "C+9", "//", "—").',
+      'If a character cannot be read with confidence write "?" in its place (e.g. "1?7"); never guess silently.',
+      'Ignore stamps, seals, signatures, logos, handwriting and colour highlighting that are not part of the printed text.',
+      '',
+      'Return the page as an ordered list of blocks, top to bottom:',
+      '- printed text line(s) outside tables: {"type":"text","text":"...","align":"right|center|left","bold":true|false,"underline":true|false}  (one block per line)',
+      '- a table: {"type":"table","header_rows":N,"continues_previous":true|false,"rows":[[cell,...],...]}',
+      'Table rules (like HTML tables):',
+      '- Each row lists its cells from RIGHT to LEFT as they appear on the page.',
+      '- A cell is {"t":"text"} plus "cs":k when it spans k columns and "rs":k when it spans k rows (omit when 1). Add "b":true if the cell text is bold.',
+      '- A cell covered by a merged cell from a row above is NOT listed again in the lower rows (exactly like HTML rowspan).',
+      '- A header written on two lines inside one cell: join the lines with "\\n".',
+      '- "header_rows" = how many rows at the top are column headings (0 if the table starts without headings).',
+      '- "continues_previous": true only when this table has no heading rows because it continues a table from the previous page' + (prev ? ` (the previous table had ${prev.cols} columns; its headings were ${JSON.stringify(prev.head)}).` : '.'),
+      '',
+      pdfText ? 'The PDF page also carries this machine text layer (exact characters, but not in table order). When it contains a value you see in the image, use its exact characters:\n' + pdfText : '',
+      'Reply with ONLY this JSON: {"blocks":[...],"unreadable":false}. Set "unreadable": true only if nothing on the page can be read.',
+    ].filter((l) => l !== '').join('\n');
+  }
+
+  async function slices(blob, maxCount) {
+    // Claude sees each image at about 1.2 megapixels: send the whole page (layout) and zoomed bands (small digits)
+    let bmp;
+    try { bmp = await createImageBitmap(blob); } catch (e) { return [blob]; }
+    const w = bmp.width, h = bmp.height;
+    const toPng = (y0, y1) => {
+      const c = document.createElement('canvas'); c.width = w; c.height = y1 - y0;
+      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, w, c.height); g.drawImage(bmp, 0, y0, w, c.height, 0, 0, w, c.height);
+      return new Promise((r) => c.toBlob(r, 'image/jpeg', 0.92));
+    };
+    const whole = /image\/(png|jpeg|webp|gif)/.test(blob.type) && blob.size < 15e6 ? blob : await toPng(0, h);
+    let n = Math.ceil((w * h) / 1.3e6);
+    n = Math.max(0, Math.min(n, 4, (maxCount || 1) - 1));
+    if (n < 2) return [whole];
+    const ov = Math.round(h * 0.04), step = Math.ceil(h / n);
+    const out = [whole];
+    for (let i = 0; i < n; i++) out.push(await toPng(Math.max(0, i * step - ov), Math.min(h, (i + 1) * step + ov)));
+    return out;
+  }
+
+  // ---------- 3. a table as a grid (merged cells kept) ----------
+  function toGrid(rows) {
+    const grid = []; let ncols = 0;
+    rows.forEach((row, r) => {
+      grid[r] = grid[r] || [];
+      let c = 0;
+      for (const cell of row || []) {
+        while (grid[r][c]) c++;
+        const cs = Math.max(1, Math.min(30, parseInt(cell && cell.cs, 10) || 1)), rs = Math.max(1, Math.min(200, parseInt(cell && cell.rs, 10) || 1));
+        const ref = { t: String((cell && (cell.t ?? cell.text)) ?? ''), b: !!(cell && cell.b), cs, rs, r, c };
+        for (let i = 0; i < rs; i++) for (let j = 0; j < cs; j++) {
+          grid[r + i] = grid[r + i] || [];
+          grid[r + i][c + j] = { ref, origin: i === 0 && j === 0, vcont: i > 0 && j === 0, hcont: j > 0 };
+        }
+        c += cs; ncols = Math.max(ncols, c);
+      }
+    });
+    grid.length = Math.max(rows.length, 0);   // a rowspan cannot reach past the last row
+    return { grid, ncols };
+  }
+  const num = (s) => {
+    const t = String(s || '').replace(/م²|م2|م/g, '').replace(/\s/g, '').replace(',', '.');
+    return /^-?\d+(\.\d+)?$/.test(t) ? parseFloat(t) : null;
+  };
+  const isTotalRow = (row) => row.some((s) => s && s.origin && /المجموع|مجموع/.test(s.ref.t));
+  function check(tb) {
+    const issues = []; const { grid, ncols } = tb;
+    let qs = 0; grid.forEach((row) => row.forEach((s) => { if (s && s.origin && s.ref.t.includes('?')) qs++; }));
+    if (qs) issues.push(`${qs} خانة غير واضحة (مُعلَّمة بالأصفر)`);
+    const seg = Array(ncols).fill(0), all = Array(ncols).fill(0), segN = Array(ncols).fill(0), allN = Array(ncols).fill(0);
+    let subtotals = 0;
+    grid.forEach((row, r) => {
+      if (r < tb.headerRows) return;
+      if (isTotalRow(row)) {
+        const label = row.filter((s) => s && s.origin && num(s.ref.t) === null).map((s) => s.ref.t).join(' ');
+        const grand = /الكلي|العام|الإجمالي/.test(label) || (subtotals > 0 && r === grid.length - 1 && !/الجزئي/.test(label));
+        for (let c = 0; c < ncols; c++) {
+          const s = row[c]; if (!s || !s.origin) continue;
+          const t = num(s.ref.t); if (t === null) continue;
+          const sum = grand ? all[c] : seg[c], n = grand ? allN[c] : segN[c];
+          if (n < 2) continue;
+          const intCol = Number.isInteger(t);
+          if (Math.abs(sum - t) > (intCol ? 0.5 : Math.max(0.15, Math.abs(t) * 0.0005))) {
+            const h = tb.grid.slice(0, tb.headerRows).map((hr) => hr[c] && hr[c].ref.t.split('\n')[0]).filter(Boolean).pop() || 'عمود ' + (c + 1);
+            issues.push(`«${label.replace(/\s+/g, ' ').trim()}» في «${h}»: مجموع الأسطر ${String(+sum.toFixed(2)).replace('.', ',')} والمكتوب ${s.ref.t}`);
+          }
+        }
+        if (!grand) { subtotals++; seg.fill(0); segN.fill(0); }
+        return;
+      }
+      for (let c = 0; c < ncols; c++) {
+        const s = row[c]; if (!s || !s.origin) continue;
+        const v = num(s.ref.t); if (v === null) continue;
+        seg[c] += v; all[c] += v; segN[c]++; allN[c]++;
+      }
+    });
+    return issues;
+  }
+
+  // ---------- 4. Word xml in the EDD_Ilot556 table style ----------
+  function runs(t, sz, bold, underline) {
+    const base = `<w:rFonts w:ascii="Arial" w:eastAsia="Arial" w:hAnsi="Arial" w:cs="Arial"/>` + (bold ? '<w:b/><w:bCs/>' : '') + `<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/>` + (underline ? '<w:u w:val="single"/>' : '');
+    const re = new RegExp('(' + NUM.source + '|' + LATIN.source + ')');
+    const whole = new RegExp('^(?:' + NUM.source + '|' + LATIN.source + ')$');
+    return String(t).split(re).filter((s) => s).map((s) => `<w:r><w:rPr>${base}${whole.test(s) ? '' : '<w:rtl/>'}</w:rPr><w:t xml:space="preserve">${esc(s)}</w:t></w:r>`).join('');
+  }
+  const cellPara = (t, bold) => `<w:p><w:pPr><w:bidi/><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/><w:jc w:val="center"/></w:pPr>${t ? runs(t, 22, bold) : ''}</w:p>`;
+  function textPara(b) {
+    const jc = b.align === 'center' ? 'center' : b.align === 'left' ? 'end' : 'start';
+    const big = jc === 'center' && b.bold;
+    return `<w:p><w:pPr><w:keepNext/><w:bidi/><w:spacing w:before="${big ? 240 : 60}" w:after="${big ? 160 : 60}"/><w:jc w:val="${jc}"/></w:pPr>${runs(b.text, big ? 30 : 26, !!b.bold, !!b.underline)}</w:p>`;
+  }
+  function widths(tb, TW) {
+    const { grid, ncols } = tb;
+    const sum = Array(ncols).fill(0), cnt = Array(ncols).fill(0), mx = Array(ncols).fill(0), hw = Array(ncols).fill(0);
+    grid.forEach((row, r) => row.forEach((s, c) => {
+      if (!s || !s.origin || s.ref.cs !== 1 || !s.ref.t) return;
+      const lines = s.ref.t.split('\n');
+      if (r < tb.headerRows) { hw[c] = Math.max(hw[c], ...lines.flatMap((l) => l.split(/\s+/)).map((w) => w.length)); return; }
+      const L = Math.max(...lines.map((l) => l.length));
+      sum[c] += L; cnt[c]++; mx[c] = Math.max(mx[c], L);
+    }));
+    const need = mx.map((m, c) => Math.max(hw[c] * 150, m <= 16 ? (m + 2) * 120 : 0, 520) + 260);
+    const longCols = mx.map((m, c) => (m > 16 ? c : -1)).filter((c) => c >= 0);
+    let w = need.slice();
+    longCols.forEach((c) => { w[c] = Math.max(need[c], Math.min(40, sum[c] / Math.max(cnt[c], 1)) * 120 + 230); });
+    const total = w.reduce((p, q) => p + q, 0);
+    if (total > TW && longCols.length) {
+      const fixed = w.reduce((p, q, c) => p + (longCols.includes(c) ? 0 : q), 0);
+      const rest = Math.max(TW - fixed, longCols.length * 2600);
+      const lsum = longCols.reduce((p, c) => p + w[c], 0);
+      longCols.forEach((c) => { w[c] = (w[c] * rest) / lsum; });
+    }
+    // a table never wider than the page; narrow tables keep a natural width (centred), like the scan
+    const t2 = w.reduce((p, q) => p + q, 0);
+    if (t2 > TW) w = w.map((x) => (x * TW) / t2);
+    else if (t2 < TW * 0.75) w = w.map((x) => (x * TW * 0.75) / t2);
+    return w.map((x) => Math.floor(x));
+  }
+  function tableXml(tb, TW) {
+    const { grid, ncols } = tb;
+    const w = widths(tb, TW); const tw = w.reduce((p, q) => p + q, 0);
+    const areaCols = new Set();
+    grid.slice(0, tb.headerRows).forEach((row) => row.forEach((s, c) => { if (s && s.origin && /مساحة|المساحة/.test(s.ref.t)) for (let j = 0; j < s.ref.cs; j++) areaCols.add(c + j); }));
+    const M = '<w:tcMar><w:top w:w="60" w:type="dxa"/><w:start w:w="80" w:type="dxa"/><w:bottom w:w="60" w:type="dxa"/><w:end w:w="80" w:type="dxa"/></w:tcMar>';
+    let x = `<w:tbl><w:tblPr><w:bidiVisual/><w:tblW w:w="${tw}" w:type="dxa"/><w:jc w:val="center"/>` +
+      '<w:tblBorders>' + ['top', 'start', 'bottom', 'end', 'insideH', 'insideV'].map((s) => `<w:${s} w:val="single" w:sz="4" w:space="0" w:color="auto"/>`).join('') + '</w:tblBorders>' +
+      '<w:tblLayout w:type="fixed"/><w:tblCellMar><w:start w:w="10" w:type="dxa"/><w:end w:w="10" w:type="dxa"/></w:tblCellMar></w:tblPr>' +
+      `<w:tblGrid>${w.map((v) => `<w:gridCol w:w="${v}"/>`).join('')}</w:tblGrid>`;
+    grid.forEach((row, r) => {
+      const head = r < tb.headerRows, tot = !head && isTotalRow(row);
+      const fill = head ? 'D9D9D9' : tot ? 'F2F2F2' : '';
+      x += `<w:tr><w:trPr><w:cantSplit/><w:jc w:val="center"/></w:trPr>`;
+      for (let c = 0; c < ncols; c++) {
+        const s = row[c];
+        if (s && s.hcont) continue;
+        const cs = s ? s.ref.cs : 1;
+        const width = w.slice(c, c + cs).reduce((p, q) => p + q, 0);
+        let pr = `<w:tcW w:w="${width}" w:type="dxa"/>` + (cs > 1 ? `<w:gridSpan w:val="${cs}"/>` : '');
+        let text = '';
+        if (s && s.vcont) pr += '<w:vMerge/>';
+        else if (s && s.origin) { if (s.ref.rs > 1) pr += '<w:vMerge w:val="restart"/>'; text = s.ref.t; }
+        const q = text.includes('?');
+        const shade = q ? 'FFF2CC' : fill;
+        if (shade) pr += `<w:shd w:val="clear" w:color="auto" w:fill="${shade}"/>`;
+        pr += M + '<w:vAlign w:val="center"/>';
+        let t = text;
+        if (!head && !tot && areaCols.has(c) && num(t) !== null && !/م/.test(t)) t += ' م²';
+        const bold = head || tot || (s && s.ref.b);
+        x += `<w:tc><w:tcPr>${pr}</w:tcPr>` + (t ? t.split('\n').map((l) => cellPara(l, bold)).join('') : cellPara('', false)) + '</w:tc>';
+        c += cs - 1;
+      }
+      x += '</w:tr>';
+    });
+    return x + '</w:tbl>';
+  }
+
+  // ---------- 5. assemble: pictures replaced by the page content, the rest of the file untouched ----------
+  // results: {blockIndex: [block, ...]} where block = {type:'text',...} | {type:'table', rows, header_rows, continues_previous}
+  async function build(JSZip, a, results) {
+    // A4 landscape like the EDD_Ilot556 model, whatever page size the scan came with
+    const sect = (a.doc.slice(a.doc.lastIndexOf('<w:sectPr')).match(/<w:sectPr[\s\S]*?<\/w:sectPr>/) || [''])[0];
+    const TW = 16838 - 2 * 1417;
+    let newSect = (sect || '<w:sectPr></w:sectPr>').replace(/<w:pgSz [^>]*\/>/, '').replace(/<w:pgMar [^>]*\/>/, '').replace(/<w:cols [^>]*\/>/, '');
+    const pg = '<w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="1417" w:right="1417" w:bottom="1417" w:left="1417" w:header="708" w:footer="708" w:gutter="0"/>';
+    newSect = newSect.replace(/(<w:sectPr[^>]*>)((?:<w:(?:headerReference|footerReference|endnotePr|footnotePr|type)\b[^>]*\/>)*)/, `$1$2${pg}`);
+
+    const segs = [];
+    const lastReal = () => { for (let i = segs.length - 1; i >= 0; i--) if (segs[i].t !== 'gap') return segs[i]; return null; };
+    a.blocks.forEach((b, i) => {
+      const res = results[i];
+      if (!res) {
+        const empty = b.t === 'p' && !stripTags(b.x).trim() && !/<w:drawing|<w:pict/.test(b.x);
+        segs.push({ t: empty ? 'gap' : 'xml', x: b.x }); return;
+      }
+      let firstOnPage = true;
+      for (const bl of res) {
+        if (bl.type === 'text') { if (String(bl.text || '').trim()) segs.push({ t: 'text', b: bl }); firstOnPage = false; continue; }
+        if (bl.type !== 'table' || !Array.isArray(bl.rows) || !bl.rows.length) continue;
+        const g = toGrid(bl.rows);
+        const hr = Math.max(0, Math.min(parseInt(bl.header_rows, 10) || 0, g.grid.length));
+        const prev = lastReal();
+        const cont = firstOnPage && hr === 0 && prev && prev.t === 'table' && prev.ncols === g.ncols && (bl.continues_previous || true);
+        if (cont) {
+          while (segs.length && segs[segs.length - 1].t === 'gap') segs.pop();
+          prev.grid.push(...g.grid);
+        } else segs.push({ t: 'table', grid: g.grid, ncols: g.ncols, headerRows: hr });
+        firstOnPage = false;
+      }
+    });
+    let body = ''; const report = []; let k = 0;
+    const gap = '<w:p><w:pPr><w:spacing w:before="0" w:after="0"/><w:rPr><w:sz w:val="4"/><w:szCs w:val="4"/></w:rPr></w:pPr></w:p>';
+    segs.forEach((s, i) => {
+      if (s.t === 'xml' || s.t === 'gap') { body += s.x; return; }
+      if (s.t === 'text') { body += textPara(s.b); return; }
+      k++;
+      body += tableXml(s, TW);
+      const nxt = segs[i + 1];
+      if (!nxt || nxt.t === 'table') body += gap;
+      report.push({ n: k, rows: s.grid.length, issues: check(s) });
+    });
+    const doc = a.doc.slice(0, a.bStart) + body + newSect + '</w:body></w:document>';
+    const z = new JSZip();
+    const usedIds = new Set([...doc.matchAll(/r:(?:embed|id|link)="([^"]+)"/g)].map((m) => m[1]));
+    const replaced = new Set(a.images.filter((im) => results[im.block]).map((im) => im.rid));
+    for (const [name, file] of Object.entries(a.zip.files)) {
+      if (file.dir) continue;
+      if (name === 'word/document.xml') { z.file(name, doc); continue; }
+      if (name === 'word/_rels/document.xml.rels') {
+        let r = await file.async('string');
+        r = r.replace(/<Relationship [^>]*\/>/g, (m) => { const id = (m.match(/Id="([^"]+)"/) || [])[1]; return replaced.has(id) && !usedIds.has(id) ? '' : m; });
+        z.file(name, r); continue;
+      }
+      if (a.images.some((im) => im.path === name && replaced.has(im.rid)) && !a.images.some((im) => im.path === name && usedIds.has(im.rid))) continue;
+      z.file(name, await file.async('uint8array'));
+    }
+    return { bytes: await z.generateAsync({ type: 'uint8array', compression: 'DEFLATE' }), report };
+  }
+
+
+  // a PDF has no Word file around it: start from an empty landscape Word file (shell) and put each page in order
+  async function buildFromPages(JSZip, shellFiles, results, nPages) {
+    const zip = new JSZip();
+    for (const [n, c] of Object.entries(shellFiles)) zip.file(n, c);
+    const shellDoc = shellFiles['word/document.xml'];
+    const bStart = shellDoc.indexOf('{{BODY}}');
+    const doc = shellDoc.replace('{{BODY}}', '');
+    const blocks = []; const res = {};
+    for (let p = 0; p < nPages; p++) {
+      if (results[p]) { blocks.push({ t: 'p', x: '' }); res[blocks.length - 1] = results[p]; }
+      else blocks.push({ t: 'p', x: `<w:p><w:pPr><w:bidi/><w:jc w:val="center"/></w:pPr>${runs('⚠ لم تُقرأ الصفحة ' + (p + 1) + ' من ملف PDF — أعيدي قراءتها أو اكتبيها يدوياً.', 24, true)}</w:p>` });
+    }
+    // reuse the Word-file builder: the shell plays the role of the original file
+    await zip.loadAsync(await zip.generateAsync({ type: 'uint8array' }));
+    return build(JSZip, { zip, doc, bStart, blocks, images: [] }, res);
+  }
+
+  root.EDD556 = { analyse, prompt, slices, build, buildFromPages, check, toGrid };
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const SHELLS = JSON.parse(document.getElementById('shells').textContent);
+  let analysed = null, result = null, baseName = 'EDD', a556 = null, pdf556 = null, name556 = 'EDD', out556 = null, ctl556 = null;
+  const showErr = (el, t) => { el.textContent = t; el.hidden = !t; };
+
+  async function load(file) {
+    showErr($('err'), ''); $('done').hidden = true; $('dl').hidden = true; result = null;
+    if (!file) return;
+    if (!/\.docx$/i.test(file.name)) {
+      showErr($('err'), /\.doc$/i.test(file.name)
+        ? 'هذا ملف .doc قديم. افتحيه في Word ثم «حفظ باسم» واختاري .docx، وضعيه هنا من جديد.'
+        : 'الملف يجب أن يكون Word بصيغة .docx.');
+      return;
+    }
+    const buf = await file.arrayBuffer();
+    try {
+      analysed = await EDD.analyse(JSZip, buf);
+    } catch (e) {
+      analysed = null; $('go').disabled = true;
+      showErr($('err'), 'تعذّر فتح الملف. تأكدي أنه ملف Word سليم بصيغة .docx.');
+      return;
+    }
+    baseName = file.name.replace(/\.docx$/i, '');
+    $('fname').textContent = file.name;
+    const nP = analysed.blocks.filter((b) => b.t === 'p' && b.x.replace(/<[^>]+>/g, '').trim()).length;
+    const nT = analysed.blocks.filter((b) => b.t === 'tbl').length;
+    $('stats').innerHTML = '';
+    [[nP + ' فقرة'], [nT + ' جدول'], analysed.boxed ? ['الملف داخل الإطار أصلاً'] : null].filter(Boolean).forEach(([t]) => {
+      const s = document.createElement('span'); s.className = 'chip'; s.textContent = t; $('stats').appendChild(s);
+    });
+    $('loaded').hidden = false;
+    const b = analysed.box;
+    $('fQism').value = b.qism || ''; $('fBal').value = b.baladiya || ''; $('fMaj').value = b.majmoua || '';
+    $('fHissa').value = ''; $('fWil').value = '';
+    $('detHint').textContent = 'مُلئت الخانات من نص الملف. تأكدي منها وصحّحيها إن لزم، خاصة البلدية.';
+    $('go').disabled = false;
+  }
+
+  $('inp').addEventListener('change', (e) => load(e.target.files[0]));
+  const drop = $('drop');
+  ['dragenter', 'dragover'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', (e) => load(e.dataTransfer.files[0]));
+
+  $('go').addEventListener('click', async () => {
+    if (!analysed) return;
+    $('go').disabled = true; $('go').textContent = 'جارٍ الإنشاء…';
+    try {
+      result = await EDD.convert(JSZip, analysed, { tpl: SHELLS.tpl }, {
+        qism: $('fQism').value, baladiya: $('fBal').value, majmoua: $('fMaj').value,
+        hissa: $('fHissa').value, wilaya: $('fWil').value,
+        idaHajm: $('fIdaHajm').value, idaRaqm: $('fIdaRaqm').value, fi: $('fFi').value,
+        mujallad: $('fMujallad').value, mujRaqm: $('fMujRaqm').value, rasm: $('fRasm').value,
+      });
+      const s = result.stats;
+      $('done').textContent = `تمّ: ${s.paras} فقرة، ${s.tables} جدول (${s.rows} سطر)، و«-----» في آخر ${s.dashes} فقرة. حمّلي الملف وافتحيه في Word للتأكد.`;
+      $('done').hidden = false; $('dl').hidden = false;
+    } catch (e) {
+      showErr($('dlErr'), 'حدث خطأ أثناء التحويل. أرسلي هذا الملف إلى Claude ليصلح المحوّل.');
+    }
+    $('go').disabled = false; $('go').textContent = 'إنشاء الملف من جديد';
+  });
+
+  async function save(bytes, name) {
+    showErr($('dlErr'), '');
+    const dl = window.claude && await claude.use('downloads');
+    if (!dl) { showErr($('dlErr'), 'التحميل غير متاح في هذه النافذة. افتحي الصفحة في claude.ai.'); return; }
+    try { await dl.save({ filename: name, data: new Blob([bytes]) }); }
+    catch (e) {
+      if (e && e.code === 'declined') return;
+      showErr($('dlErr'), e && e.code === 'rate_limited' ? 'نافذة تحميل مفتوحة بالفعل. أكمليها ثم أعيدي المحاولة.' : 'لم يتم التحميل. أعيدي المحاولة.');
+    }
+  }
+  $('dlTpl').addEventListener('click', () => result && save(result.template, baseName + ' - إجراء إشهار عقاري.docx'));
+
+  // ---------- 556: scanned tables ----------
+  const chip = (t, warn) => { const s = document.createElement('span'); s.className = 'chip'; if (warn) s.style.cssText = 'background:var(--warn-soft);color:var(--warn)'; s.textContent = t; return s; };
+  // pdf.js runs its worker on the page itself (the frame allows scripts from the CDN only)
+  if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  async function load556(file) {
+    a556 = null; pdf556 = null; out556 = null; $('dl556wrap').hidden = true; $('rep556').hidden = true; $('prog556').hidden = true; showErr($('err556'), '');
+    $('imgStats').innerHTML = ''; $('go556').disabled = true;
+    if (!file) return;
+    name556 = file.name.replace(/\.(pdf|docx)$/i, '');
+    $('fname556').textContent = file.name; $('fname556').hidden = false;
+    const buf = await file.arrayBuffer();
+    if (/\.pdf$/i.test(file.name)) {
+      if (!window.pdfjsLib) { showErr($('err556'), 'تعذّر تحميل قارئ PDF. أعيدي فتح الصفحة.'); return; }
+      try { pdf556 = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise; }
+      catch (e) { $('imgStats').appendChild(chip('تعذّر فتح ملف PDF', true)); return; }
+      $('imgStats').appendChild(chip(pdf556.numPages + ' صفحة في الملف'));
+      $('go556').disabled = false; return;
+    }
+    if (!/\.docx$/i.test(file.name)) { showErr($('err556'), 'الملف يجب أن يكون PDF (أو Word بصيغة .docx).'); return; }
+    try { a556 = await EDD556.analyse(JSZip, buf); } catch (e) { $('imgStats').appendChild(chip('تعذّر فتح الملف', true)); return; }
+    const ok = a556.images.filter((i) => i.ok).length, bad = a556.images.length - ok;
+    $('imgStats').appendChild(chip(ok + ' صورة جدول في الملف'));
+    if (bad) $('imgStats').appendChild(chip(bad + ' صورة بصيغة لا تُقرأ (تبقى كما هي)', true));
+    $('go556').disabled = ok === 0;
+    if (!ok) showErr($('err556'), 'لا توجد صور جداول داخل هذا الملف.');
+  }
+  $('inp556').addEventListener('change', (e) => load556(e.target.files[0]));
+  const drop556 = $('drop556');
+  ['dragenter', 'dragover'].forEach((ev) => drop556.addEventListener(ev, (e) => { e.preventDefault(); drop556.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach((ev) => drop556.addEventListener(ev, (e) => { e.preventDefault(); drop556.classList.remove('over'); }));
+  drop556.addEventListener('drop', (e) => load556(e.dataTransfer.files[0]));
+  // one PDF page as a sharp picture (about 300 dpi for an A4 page) + its text layer, if any
+  async function pdfPage(n) {
+    const page = await pdf556.getPage(n);
+    const v1 = page.getViewport({ scale: 1 });
+    const scale = Math.min(2600 / v1.width, 4200 / v1.height, 4.5);
+    const v = page.getViewport({ scale });
+    const c = document.createElement('canvas'); c.width = Math.floor(v.width); c.height = Math.floor(v.height);
+    const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+    await page.render({ canvasContext: g, viewport: v }).promise;
+    const blob = await new Promise((r) => c.toBlob(r, 'image/jpeg', 0.95));
+    let text = '';
+    try { const tc = await page.getTextContent(); text = tc.items.map((i) => i.str).join(' ').replace(/\s+/g, ' ').trim(); } catch (e) {}
+    page.cleanup();
+    return { blob, text: text.length > 30 ? text.slice(0, 6000) : '' };
+  }
+  $('stop556').addEventListener('click', () => ctl556 && ctl556.abort());
+  $('go556').addEventListener('click', async () => {
+    if (!a556 && !pdf556) return;
+    showErr($('err556'), '');
+    const sample = window.claude ? await claude.use('sample') : null;
+    if (!sample) { showErr($('err556'), 'قراءة الصور تعمل فقط عند فتح الصفحة داخل Claude.'); return; }
+    const lim = await sample.limits().catch(() => null);
+    if (!lim || !lim.images) { showErr($('err556'), 'إرسال الصور إلى Claude غير متاح في هذه النافذة.'); return; }
+    const isPdf = !!pdf556;
+    const imgs = isPdf ? Array.from({ length: pdf556.numPages }, (_, p) => ({ page: p })) : a556.images.filter((i) => i.ok);
+    const unit = isPdf ? 'الصفحة' : 'الصورة';
+    const results = {}; let lastTable = null, failed = 0, stopped = false, readOk = 0;
+    $('go556').disabled = true; $('stop556').hidden = false; $('dl556wrap').hidden = true; $('rep556').hidden = true;
+    $('prog556').hidden = false;
+    for (let k = 0; k < imgs.length; k++) {
+      const im = imgs[k];
+      $('prog556').textContent = `جارٍ قراءة ${unit} ${k + 1} من ${imgs.length}… (قد تأخذ كل ${unit === 'الصفحة' ? 'صفحة' : 'صورة'} بين دقيقة ودقيقتين لقراءتها بدقة)`;
+      ctl556 = new AbortController();
+      try {
+        let raw, pdfText = '';
+        if (isPdf) { const pg = await pdfPage(im.page + 1); raw = pg.blob; pdfText = pg.text; }
+        else {
+          const mime = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp', bmp: 'image/bmp' }[im.ext];
+          raw = new Blob([await a556.zip.file(im.path).async('uint8array')], { type: mime });
+        }
+        const parts = await EDD556.slices(raw, lim.images.maxCount);
+        const ans = await sample.json(EDD556.prompt(lastTable, parts.length, pdfText), { images: parts, signal: ctl556.signal, modelTier: 'complex' });
+        const blocks = ans && Array.isArray(ans.blocks) && !ans.unreadable ? ans.blocks.filter((b) => b && (b.type === 'text' || (b.type === 'table' && Array.isArray(b.rows)))) : [];
+        if (blocks.some((b) => b.type === 'table')) {
+          const key = isPdf ? im.page : im.block; (results[key] = results[key] || []).push(...blocks); readOk++;
+          for (const b of blocks) if (b.type === 'table') {
+            const g = EDD556.toGrid(b.rows);
+            const hr = parseInt(b.header_rows, 10) || 0;
+            lastTable = { cols: g.ncols, head: hr ? b.rows.slice(0, hr).map((r) => r.map((c) => c && c.t)) : (lastTable ? lastTable.head : []) };
+          }
+        } else failed++;
+      } catch (e) {
+        if (e && e.code === 'cancelled') { stopped = true; break; }
+        if (e && (e.code === 'not_granted' || e.code === 'sampling_disabled' || e.code === 'images_unavailable')) { showErr($('err556'), 'لم يُسمح لهذه الصفحة باستعمال Claude، فلا يمكن قراءة الصور.'); stopped = true; break; }
+        if (e && e.code === 'rate_limited') { showErr($('err556'), 'تم الوصول إلى حد الاستعمال الآن. انتظري قليلاً ثم أعيدي المحاولة.'); stopped = true; break; }
+        failed++;
+      }
+    }
+    $('stop556').hidden = true; $('go556').disabled = false; ctl556 = null;
+    if (!Object.keys(results).length) { $('prog556').textContent = stopped ? 'تم الإيقاف.' : 'لم تُقرأ أي صورة.'; return; }
+    const built = isPdf ? await EDD556.buildFromPages(JSZip, SHELLS.s556, results, pdf556.numPages) : await EDD556.build(JSZip, a556, results);
+    out556 = built.bytes;
+    $('prog556').textContent = `${stopped ? 'تم الإيقاف. ' : ''}قُرئت ${readOk} ${isPdf ? 'صفحة' : 'صورة'} من ${imgs.length}` + (failed ? `، و${failed} لم تُقرأ (${isPdf ? 'عليها ملاحظة في الملف' : 'بقيت صوراً في الملف'})` : '') + '.';
+    const rep = $('rep556'); rep.innerHTML = '';
+    for (const r of built.report) {
+      const li = document.createElement('li');
+      li.textContent = `جدول ${r.n}: ${r.rows} سطر — ` + (r.issues.length ? '⚠ ' + r.issues.join('؛ ') : 'المجموع مطابق أو لا يوجد سطر مجموع');
+      if (r.issues.length) li.style.color = 'var(--warn)';
+      rep.appendChild(li);
+    }
+    rep.hidden = false; $('dl556wrap').hidden = false;
+  });
+  $('dl556').addEventListener('click', () => out556 && save(out556, name556 + ' - عقد جدول الوصفي للتقسيم.docx'));
+})();
+
+</script>
+<script>
+(function () {
+  // entry code: only its SHA-256 (with a fixed prefix) is in the page, never the code itself
+  const HASH = '6403ad4c6893e4b2fb57cc2ebb994b71d8993c3dd01145cf864693bcfa818748';
+  const form = document.getElementById('gateForm'), inp = document.getElementById('code'), err = document.getElementById('codeErr');
+  let tries = 0, waitUntil = 0;
+  const hex = (buf) => Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, '0')).join('');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (Date.now() < waitUntil) { err.textContent = 'محاولات كثيرة. انتظري قليلاً ثم أعيدي.'; err.hidden = false; return; }
+    let ok = false;
+    try { ok = hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('djebari-edd:' + inp.value.trim()))) === HASH; } catch (x) { ok = false; }
+    if (ok) { document.getElementById('gate').hidden = true; document.getElementById('app').hidden = false; inp.value = ''; return; }
+    tries++; inp.value = ''; inp.focus();
+    if (tries >= 5) { waitUntil = Date.now() + 30000; tries = 0; err.textContent = 'رمز خاطئ 5 مرات. انتظري 30 ثانية.'; }
+    else err.textContent = 'الرمز غير صحيح.';
+    err.hidden = false;
+  });
+  inp.focus();
+})();
+(function () {
+  // two tools as tabs; the last one used is remembered on this computer
+  const tabs = [['tabTpl', 'panelTpl'], ['tab556', 'panel556']];
+  const show = (id) => {
+    for (const [t, p] of tabs) {
+      const on = t === id;
+      document.getElementById(t).setAttribute('aria-selected', on ? 'true' : 'false');
+      document.getElementById(p).hidden = !on;
+    }
+    try { localStorage.setItem('edd_tab', id); } catch (e) {}
+  };
+  for (const [t] of tabs) document.getElementById(t).addEventListener('click', () => show(t));
+  let last = null; try { last = localStorage.getItem('edd_tab'); } catch (e) {}
+  if (last && tabs.some(([t]) => t === last)) show(last);
+})();
+
+</script>
