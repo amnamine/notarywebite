@@ -1,62 +1,69 @@
-# أدوات مكتب التوثيق — إشهار عقاري (الإصدار الثاني V2)
+# أدوات مكتب التوثيق — إشهار عقاري (نظام متكامل V2)
 
-تطبيق رسمي لتحضير العقود التوثيقية بصيغة Word (`.docx`) باللغة العربية مع الإطار الرسمي للجمهورية الجزائرية.
-
----
-
-## المكونات المتوفرة وطرق التشغيل:
-
-### 1. موقع الويب الداخلي (Flask Web App):
-- **التشغيل المباشر**: اضغط نقرتين على [`start.bat`](file:///d:/AMINE2/COURS%20FAC/travaux/NOTARYY/notaryv2/notary-main/start.bat) أو نفّذ:
-  ```bash
-  python app.py
-  ```
-- **العنوان**: `http://127.0.0.1:5000`
-- **حساب المدير الافتراضي**:
-  - اسم المستخدم: `admin`
-  - كلمة المرور: `admin123`
-- **المميزات**: معالجة في المتصفح بالكامل (Client-side JS)، سرية تامة دون رفع ملفات، إدارة مستخدمين، وسجل عمليات نشط.
-
-### 2. التطبيق المكتبي المستقل (Tkinter Desktop App V2):
-- **ملف التشغيل التنفيذي الجاهز (.exe)**:
-  - المسار: [`dist/Ijraa_Ichhar_Notary_v2/Ijraa_Ichhar_Notary_v2.exe`](file:///d:/AMINE2/COURS%20FAC/travaux/NOTARYY/notaryv2/notary-main/dist/Ijraa_Ichhar_Notary_v2/Ijraa_Ichhar_Notary_v2.exe)
-  - أو اضغط نقرتين على: [`desktop_app/start_desktop.bat`](file:///d:/AMINE2/COURS%20FAC/travaux/NOTARYY/notaryv2/notary-main/desktop_app/start_desktop.bat)
-- **المميزات**: يعمل دون الحاجة لتثبيت بايثون أو وجود اتصال بالإنترنت، استخراج آلي لبيانات مسح الأراضي وتاريخ العقد والفهرس.
-
-### 3. النسخة المستقلة أحادية الملف (Offline USB Single File):
-- متوفرة في المجلد [`dist/index_offline_single_file.html`](file:///d:/AMINE2/COURS%20FAC/travaux/NOTARYY/notaryv2/notary-main/dist/index_offline_single_file.html) للعمل على أي متصفح مباشرة دون خادم.
-- يمكن إعادة بنائها في أي وقت عبر تشغيل:
-  ```bash
-  python build_single_file.py
-  ```
+تطبيق رسمي لتحضير العقود التوثيقية بصيغة Word (`.docx`) باللغة العربية مع مراعاة كافة القواعد الرسمية للإشهار العقاري بالجمهورية الجزائرية.
 
 ---
 
-## هيكل المجلدات المنظم (Clean Project Structure)
+## 🚀 ملفات التشغيل السريع (One-Click Launchers)
+
+في المجلد الرئيسي ستجد ملفات تشغيل مخصصة لكل بيئة:
+
+1. **`start_web.bat`** :
+   - يُشغّل خادم الويب الداخلي ويفتح المتصفح تلقائياً على الرابط: `http://127.0.0.1:5000`.
+   - **بيانات الدخول الافتراضية**: المستخدم `admin` | كلمة المرور `admin123`.
+   - يدعم التبديل السلس بين اللغات الثلاث (عربية، فرنسية، إنجليزية) مع واجهة ليلية/نهارية وسرية تامة دون إرسال محتوى الملفات للخادم.
+
+2. **`start_desktop_v2.bat`** :
+   - يُشغّل التطبيق المكتبي الحديث **(V2 Modern Executable)** مباشرة بدون الحاجة لإنترنت أو فتح المتصفح.
+
+3. **`start_desktop_v1.bat`** :
+   - يُشغّل النسخة المكتبية السابقة **(V1 Classic Executable)**.
+
+---
+
+## 📁 هيكل المجلدات المنظم (Organized Project Structure)
+
 ```
 notary-main/
-├── app.py                      # نقطة تشغيل خادم الويب Flask
-├── start.bat                   # ملف التشغيل السريع للموقع (ويندوز)
-├── build_single_file.py        # مولد نسخة الويب المستقلة للاستخدام دون إنترنت
-├── requirements.txt            # متطلبات بايثون الأساسية
 │
-├── core_engine/                # المحرك البرمجي المشترك لمعالجة المستندات والـ XML
-│   ├── ijraa_converter.py      # محرك إدراج العقود وتنسيق الجداول والأرقام والفواصل
-│   ├── detect_box.py           # مستخرج مراجع المسح والفهرس والبلدية
-│   ├── xml_helpers.py          # أدوات فحص وتعديل تراكيب الـ Word OpenXML
-│   └── models.py               # قاعدة البيانات (المستخدمين وسجل العمليات)
+├── 📦 dist_executables/                  # مجلد البرامج والنسخ التنفيذية الجاهزة
+│   ├── v2_modern/                       # الإصدار الثاني V2 الحديث (.exe) مع حقول الفهرس وتاريخ العقد
+│   │   └── Ijraa_Ichhar_Notary_v2.exe
+│   ├── v1_classic/                      # الإصدار الأول V1 الكلاسيكي (.exe)
+│   │   └── Ijraa_Ichhar_Notary.exe
+│   └── web_offline_single_file/         # نسخة الويب المستقلة كملف واحد (للفلاش ديسك USB)
+│       └── index_offline_single_file.html
 │
-├── desktop_app/                # تطبيق سطح المكتب (Tkinter Desktop V2)
-│   ├── main_gui.py             # الكود المصدري للواجهة
-│   ├── start_desktop.bat       # ملف تشغيل النسخة المكتبية
-│   └── docx_templates/         # القوالب الرسمية المعتمدة
+├── 🌐 routes/                           # مسارات خادم الويب (دخول، أدوات، لوحة تحكم)
+├── ⚙️ core_engine/                      # المحرك البرمجي لمعالجة ملفات Word و XML
+│   ├── ijraa_converter.py               # محرك تصغير الجداول وتنسيق المسافات والفواصل
+│   ├── detect_box.py                    # مستخرج مراجع المسح والفهرس والبلديات آلياً
+│   ├── i18n.py                          # قواميس الترجمة الرسمية (عربي / فرنسي / إنجليزي)
+│   ├── xml_helpers.py                   # أدوات معالجة تراكيب OpenXML
+│   └── models.py                        # قاعدة بيانات المستخدمين وسجل العمليات
 │
-├── dist/                       # مجلد الملفات الجاهزة للتوزيع
-│   ├── Ijraa_Ichhar_Notary_v2/ # تطبيق الويندوز التنفيذي (.exe) V2
-│   └── index_offline_single_file.html # نسخة الويب أحادية الملف
+├── 🖥️ desktop_app/                      # كود واجهة تطبيق سطح المكتب (Tkinter Python)
+│   ├── main_gui.py                      # الواجهة الرسومية V2 الحديثة
+│   └── docx_templates/                  # القوالب الرسمية المعتمدة
 │
-├── routes/                     # مسارات ونقاط نهاية خادم الويب
-├── static/                     # ملفات الجافاسكريبت والقوالب والمظهر (CSS/JS)
-├── templates/                  # قوالب صفحات الويب (Jinja2 HTML)
-└── tests/                      # الاختبارات التلقائية المعتمدة
+├── 📁 templates/                        # قوالب صفحات الويب (Jinja2 HTML)
+├── 🎨 static/                           # ملفات التنسيق CSS، الجافاسكريبت، والقوالب الثابتة
+├── 🧪 tests/                            # الاختبارات البرمجية الأوتوماتيكية
+├── 🗄️ archive_sources/                 # مجلد أرشيف الأكواد المرجعية والمصادر الخام
+│
+├── app.py                               # ملف خادم Flask الرئيسي
+├── build_single_file.py                 # سكريبت إعادة توليد ملف الويب المستقل
+├── requirements.txt                     # متطلبات بايثون
+├── start_web.bat                        # تشغيل الموقع بنقرة واحدة
+├── start_desktop_v2.bat                 # تشغيل تطبيق V2 بنقرة واحدة
+└── start_desktop_v1.bat                 # تشغيل تطبيق V1 بنقرة واحدة
+```
+
+---
+
+## 🧪 الاختبارات والتطوير (Testing)
+
+للتأكد من سلامة المحرك في أي وقت:
+```bash
+python -m pytest tests/
 ```

@@ -8,9 +8,9 @@ import json
 
 def build():
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    claude_dir = os.path.join(base_dir, 'claude_artifact')
-    out_file = os.path.join(base_dir, 'dist', 'index_offline_single_file.html')
-    os.makedirs(os.path.join(base_dir, 'dist'), exist_ok=True)
+    claude_dir = os.path.join(base_dir, 'archive_sources', 'claude_artifact')
+    out_file = os.path.join(base_dir, 'dist_executables', 'web_offline_single_file', 'index_offline_single_file.html')
+    os.makedirs(os.path.dirname(out_file), exist_ok=True)
 
     with open(os.path.join(claude_dir, 'page', 'head.html'), 'r', encoding='utf-8') as f:
         head_html = f.read()
