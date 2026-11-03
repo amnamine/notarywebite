@@ -6,6 +6,7 @@ import os
 import click
 from flask import Flask, request, session
 from dotenv import load_dotenv
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
 
@@ -26,6 +27,13 @@ def create_app():
     app.config['DOCX_TEMPLATES_DIR'] = os.path.join(base_dir, 'docx_templates')
     app.config['ANTHROPIC_API_KEY'] = os.getenv('ANTHROPIC_API_KEY', '')
     app.config['AI_MODEL'] = os.getenv('AI_MODEL', 'claude-3-5-sonnet-latest')
+
+    # Fix reverse proxy headers (Render, Heroku, Nginx)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
+    # CSRF & Security Configurations
+    # Disable strict referrer checking when behind HTTPS reverse proxies
+    app.config['WTF_CSRF_SSL_STRICT'] = False
 
     os.makedirs(app.config['DATA_DIR'], exist_ok=True)
     os.makedirs(os.path.join(app.config['DATA_DIR'], 'jobs'), exist_ok=True)
@@ -68,7 +76,7 @@ def create_app():
     def add_security_headers(response):
         response.headers['X-Frame-Options'] = 'DENY'
         response.headers['X-Content-Type-Options'] = 'nosniff'
-        response.headers['Referrer-Policy'] = 'no-referrer'
+        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
         response.headers['Content-Security-Policy'] = (
             "default-src 'self'; "
             "script-src 'self' 'unsafe-inline'; "
