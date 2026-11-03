@@ -1,24 +1,24 @@
 {% extends "base.html" %}
-{% block title %}تسجيل الدخول — أدوات مكتب التوثيق{% endblock %}
+{% block title %}{{ t('login_title') }} — {{ t('office_name') }}{% endblock %}
 
 {% block content %}
 <div style="max-width:400px; margin: 40px auto; width:100%;">
   <form class="sheet" method="POST" action="{{ url_for('routes.login') }}" style="padding: 26px; display:grid; gap:16px;">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-    <h1 style="font-family:var(--display); font-size:24px; margin:0;">تسجيل الدخول</h1>
-    <p style="margin:0; font-size:14px; color:var(--muted);">هذه الأداة خاصة بمكتب التوثيق. أدخل بيانات الدخول للمتابعة.</p>
+    <h1 style="font-family:var(--display); font-size:24px; margin:0;">{{ t('login_title') }}</h1>
+    <p style="margin:0; font-size:14px; color:var(--muted);">{{ t('login_desc') }}</p>
     
     <label>
-      اسم المستخدم
+      {{ t('username') }}
       <input type="text" name="username" required autofocus autocomplete="username">
     </label>
     
     <label>
-      كلمة المرور
+      {{ t('password') }}
       <input type="password" name="password" required autocomplete="current-password">
     </label>
 
-    <button type="submit" style="margin-top:8px;">دخول</button>
+    <button type="submit" style="margin-top:8px;">{{ t('login_btn') }}</button>
   </form>
 </div>
 {% endblock %}

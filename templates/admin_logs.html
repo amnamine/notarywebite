@@ -1,20 +1,20 @@
 {% extends "base.html" %}
-{% block title %}سجل العمليات — مكتب التوثيق{% endblock %}
+{% block title %}{{ t('admin_logs_title') }} — {{ t('office_name') }}{% endblock %}
 
 {% block content %}
 <section class="sheet" style="padding: 24px;">
-  <h2 style="margin-top:0;">سجل عمليات تحضير العقود (Activity Log)</h2>
-  <p class="hint" style="margin-bottom:16px;">ملاحظة: السجل يحتفظ فقط بأسماء الملفات وعدد الصفحات/التحذيرات، ولا يخزن أي محتوى ملفات لضمان السرية التامة.</p>
+  <h2 style="margin-top:0;">{{ t('admin_logs_title') }}</h2>
+  <p class="hint" style="margin-bottom:16px;">{{ t('admin_logs_hint') }}</p>
 
   <table class="data-table">
     <thead>
       <tr>
-        <th>المستخدم</th>
-        <th>الأداة</th>
-        <th>اسم الملف الأصلي</th>
-        <th>الصفحات / الجداول</th>
-        <th>التنبيهات ⚠</th>
-        <th>التوقيت</th>
+        <th>{{ t('log_user') }}</th>
+        <th>{{ t('log_tool') }}</th>
+        <th>{{ t('log_file') }}</th>
+        <th>{{ t('log_counts') }}</th>
+        <th>{{ t('log_alerts') }}</th>
+        <th>{{ t('log_time') }}</th>
       </tr>
     </thead>
     <tbody>
@@ -23,19 +23,19 @@
         <td><b>{{ l.username }}</b></td>
         <td>{{ l.tool_name }}</td>
         <td class="file">{{ l.original_filename }}</td>
-        <td>{{ l.pages_count }} فقرة/صفحة | {{ l.tables_count }} جدول</td>
+        <td>{{ l.pages_count }} | {{ l.tables_count }}</td>
         <td>
           {% if l.warnings_count > 0 %}
-            <span class="chip" style="background:var(--warn-soft); color:var(--warn);">⚠ {{ l.warnings_count }} تنبيه</span>
+            <span class="chip" style="background:var(--warn-soft); color:var(--warn);">⚠ {{ l.warnings_count }}</span>
           {% else %}
-            <span class="chip" style="background:var(--ok-soft); color:var(--ok);">سليم</span>
+            <span class="chip" style="background:var(--ok-soft); color:var(--ok);">✓</span>
           {% endif %}
         </td>
         <td class="ltr">{{ l.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
       </tr>
       {% else %}
       <tr>
-        <td colspan="6" style="text-align:center; color:var(--muted); padding:24px;">لا توجد عمليات مسجلة بعد.</td>
+        <td colspan="6" style="text-align:center; color:var(--muted); padding:24px;">{{ t('log_empty') }}</td>
       </tr>
       {% endfor %}
     </tbody>

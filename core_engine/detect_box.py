@@ -56,9 +56,14 @@ def detect_box(text: str) -> Dict[str, str]:
     bal = freq(r'بلدي[ةه]\s*[:：]?\s*([^،,.:()\-0-9\n]{2,60})', STOP_BAL)
     wil = freq(r'ولاي[ةه]\s*[:：]?\s*([^،,.:()\-0-9\n]{2,40})', STOP_WIL)
 
+    # fihris match
+    fihris_m = re.search(r'فـ*هـ*ـ*ر[ـ]*س\s*(?:ر[ـ]*ق[ـ]*م)?\s*[:：]?\s*(\d+\s*/\s*\d+)', text)
+    fihris = re.sub(r'\s+', '', fihris_m.group(1)) if fihris_m else ''
+
     return {
         'qism': ' و '.join(qism[:6]),
         'majmoua': '، '.join(maj[:20]),
+        'fihris': fihris,
         'baladiya': bal,
         'wilaya': wil,
     }

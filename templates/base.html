@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}أدوات مكتب بوخاري مريم{% endblock %}</title>
+  <title>{% block title %}{{ t('office_name') }}{% endblock %}</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -17,23 +17,23 @@
         <text x="23" y="29" text-anchor="middle" font-size="17">ب.م</text>
       </svg>
       <div class="office">
-        <b>مكتب الأستاذ بوخاري مريم</b>
-        <span>موثق — الجزائر</span>
+        <b>{{ t('office_name') }}</b>
+        <span>{{ t('office_title') }}</span>
       </div>
       <div class="nav-actions">
         {% if current_user.is_authenticated %}
           {% if current_user.is_admin %}
-            <a href="{{ url_for('routes.admin_users') }}" class="tag" style="text-decoration:none;">المستخدمين</a>
-            <a href="{{ url_for('routes.admin_logs') }}" class="tag" style="text-decoration:none;">سجل العمليات</a>
+            <a href="{{ url_for('routes.admin_users') }}" class="tag" style="text-decoration:none;">{{ t('users') }}</a>
+            <a href="{{ url_for('routes.admin_logs') }}" class="tag" style="text-decoration:none;">{{ t('logs') }}</a>
           {% endif %}
-          <a href="{{ url_for('routes.logout') }}" class="tag" style="text-decoration:none;">خروج ({{ current_user.username }})</a>
+          <a href="{{ url_for('routes.logout') }}" class="tag" style="text-decoration:none;">{{ t('logout') }} ({{ current_user.username }})</a>
         {% endif %}
         <div class="lang-switcher">
           <a href="{{ url_for('routes.set_locale', lang='ar') }}" class="{% if curr_lang == 'ar' %}active{% endif %}">ع</a>
           <a href="{{ url_for('routes.set_locale', lang='fr') }}" class="{% if curr_lang == 'fr' %}active{% endif %}">FR</a>
           <a href="{{ url_for('routes.set_locale', lang='en') }}" class="{% if curr_lang == 'en' %}active{% endif %}">EN</a>
         </div>
-        <button id="themeToggle" class="theme-btn" title="تغيير المظهر">🌓</button>
+        <button id="themeToggle" class="theme-btn" title="{{ t('theme_toggle') }}">🌓</button>
       </div>
     </div>
   </header>
@@ -52,21 +52,23 @@
     {% block content %}{% endblock %}
   </div>
 
-  <footer class="gutter" style="text-align:center; padding-block: 20px; color:var(--muted); font-size:13px;">
-    أداة داخلية لمكتب التوثيق — مكتب الأستاذ بوخاري مريم © 2026
+  <footer class="gutter">
+    {{ t('office_name') }} — {{ t('privacy_note') }}
   </footer>
 
   <script>
-    // Theme toggler
-    const btn = document.getElementById('themeToggle');
-    btn.addEventListener('click', () => {
-      const cur = document.documentElement.getAttribute('data-theme') || 'auto';
-      const nxt = cur === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', nxt);
-      localStorage.setItem('edd_theme', nxt);
+    // Theme Switcher Logic
+    const toggle = document.getElementById('themeToggle');
+    const root = document.documentElement;
+    const saved = localStorage.getItem('theme');
+    if (saved) root.setAttribute('data-theme', saved);
+
+    toggle.addEventListener('click', () => {
+      const isDark = root.getAttribute('data-theme') === 'dark';
+      const next = isDark ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
     });
-    const savedTheme = localStorage.getItem('edd_theme');
-    if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
   </script>
   {% block scripts %}{% endblock %}
 </body>

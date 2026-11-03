@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from core_engine.models import db, login_manager, csrf, babel, User
+from core_engine.i18n import get_text
 from routes.main import routes_bp
 
 def create_app():
@@ -58,8 +59,25 @@ def create_app():
         return {
             'curr_lang': curr_lang,
             'dir': 'rtl' if is_rtl else 'ltr',
-            'is_rtl': is_rtl
+            'is_rtl': is_rtl,
+            't': lambda k: get_text(curr_lang, k)
         }
+
+    # Security Headers
+    @app.after_request
+    def add_security_headers(response):
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['Referrer-Policy'] = 'no-referrer'
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com data:; "
+            "img-src 'self' data:; "
+            "blob:;"
+        )
+        return response
 
     # Register routes
     app.register_blueprint(routes_bp)

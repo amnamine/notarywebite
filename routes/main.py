@@ -171,6 +171,28 @@ def ijraa_convert():
         return jsonify({'error': f'حدث خطأ أثناء الإنشاء: {str(e)}'}), 500
 
 
+@routes_bp.route('/api/log', methods=['POST'])
+@login_required
+def api_log():
+    data = request.get_json(silent=True) or {}
+    filename = data.get('original_file_name') or data.get('filename') or 'عقد'
+    pages = data.get('page_count_estimate') or data.get('paras') or 0
+    tables = data.get('tables') or 0
+    
+    log = ActivityLog(
+        user_id=current_user.id,
+        username=current_user.username,
+        tool_name='إجــراء إشهار عقاري (متصفح)',
+        original_filename=filename,
+        pages_count=pages,
+        tables_count=tables,
+        warnings_count=0
+    )
+    db.session.add(log)
+    db.session.commit()
+    return jsonify({'status': 'ok'})
+
+
 # ----------------- Admin Endpoints -----------------
 @routes_bp.route('/admin/users', methods=['GET', 'POST'])
 @login_required

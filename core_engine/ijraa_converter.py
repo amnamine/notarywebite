@@ -387,6 +387,13 @@ def convert_ijraa(analysed: Dict[str, Any], template_dir: str, box_values: Dict[
     end_p = '<w:p><w:pPr><w:bidi/><w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/><w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr></w:p>'
     content_xml, stats = build_content(analysed, 'tpl')
 
+    # Add header line: تاريخ تحرير العقد: ... ، الفهرس : ...
+    dt = (box_values.get('date') or '').strip() or '..................'
+    fh = (box_values.get('fihris') or '').strip() or '..................'
+    header_line = f"تاريخ تحرير العقد: {dt} ، الفهرس : {fh}."
+    header_p = f'<w:p><w:pPr><w:bidi/><w:spacing w:before="0" w:after="60" w:line="276" w:lineRule="auto"/><w:ind w:start="0" w:end="0"/><w:jc w:val="start"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:b/><w:bCs/><w:sz w:val="24"/><w:szCs w:val="24"/><w:rtl/></w:rPr><w:t xml:space="preserve">{esc_xml(header_line)}</w:t></w:r></w:p>'
+    content_xml = header_p + content_xml
+
     doc_xml_path = os.path.join(template_dir, 'word', 'document.xml')
     with open(doc_xml_path, 'r', encoding='utf-8') as f:
         tdoc = f.read()
@@ -401,6 +408,7 @@ def convert_ijraa(analysed: Dict[str, Any], template_dir: str, box_values: Dict[
     tdoc = tdoc.replace('{{MAJMOUA}}', v(box_values.get('majmoua'), ''))
     tdoc = tdoc.replace('{{HISSA}}', v(box_values.get('hissa'), ''))
     tdoc = tdoc.replace('{{WILAYA}}', v(box_values.get('wilaya'), '..............'))
+    tdoc = tdoc.replace('{{MUHAFIZ}}', v(box_values.get('wilaya'), ''))
     tdoc = tdoc.replace('{{IDA_HAJM}}', v(box_values.get('idaHajm'), '..................'))
     tdoc = tdoc.replace('{{IDA_RAQM}}', v(box_values.get('idaRaqm'), '..................'))
     tdoc = tdoc.replace('{{FI}}', v(box_values.get('fi'), '..............................................'))
