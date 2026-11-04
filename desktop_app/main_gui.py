@@ -1,5 +1,5 @@
 """
-تطبيق مكتبي حديث (Tkinter GUI v2) لمكتب التوثيق
+تطبيق مكتبي حديث (Tkinter GUI v2) — مكتب الأستاذة حاجي آسيا، موثقة
 إجراء إشهار عقاري: معالجة ملفات Word ووضعها داخل الإطار الرسمي تلقائياً دون الحاجة لإنترنت.
 """
 import sys
@@ -350,17 +350,37 @@ def keep_table(x: str, W: int, st: Dict[str, Any]) -> str:
     return x
 
 def analyse_docx(zip_bytes: bytes) -> Dict[str, Any]:
-    with zipfile.ZipFile(io.BytesIO(zip_bytes), 'r') as z:
-        if 'word/document.xml' not in z.namelist():
-            raise ValueError('NOT_DOCX')
-        doc = z.read('word/document.xml').decode('utf-8')
-        styles_xml = z.read('word/styles.xml').decode('utf-8') if 'word/styles.xml' in z.namelist() else ''
-        theme_file = next((n for n in z.namelist() if re.match(r'^word/theme/theme\d*\.xml$', n)), None)
-        theme_xml = z.read(theme_file).decode('utf-8') if theme_file else ''
+    try:
+        z = zipfile.ZipFile(io.BytesIO(zip_bytes), 'r')
+    except Exception as e:
+        raise ValueError(f"الملف ليس بصيغة Word (.docx) صالحة: {e}")
 
-    b_start = doc.find('<w:body>') + 8
+    with z:
+        namelist = z.namelist()
+        if 'word/document.xml' not in namelist:
+            raise ValueError('الملف لا يحتوي على word/document.xml، تأكد من سلامة ملف Word.')
+        
+        doc = z.read('word/document.xml').decode('utf-8', errors='replace')
+        styles_xml = z.read('word/styles.xml').decode('utf-8', errors='replace') if 'word/styles.xml' in namelist else ''
+        theme_file = next((n for n in namelist if re.match(r'^word/theme/theme\d*\.xml$', n)), None)
+        theme_xml = z.read(theme_file).decode('utf-8', errors='replace') if theme_file else ''
+
+    b_idx = doc.find('<w:body>')
+    if b_idx >= 0:
+        b_start = b_idx + 8
+    else:
+        b_idx_tag = doc.find('<w:body')
+        b_start = doc.find('>', b_idx_tag) + 1 if b_idx_tag >= 0 else 0
+
     sect_pos = doc.rfind('<w:sectPr')
-    body_end = sect_pos if sect_pos > 0 else doc.rfind('</w:body>')
+    body_end_idx = doc.rfind('</w:body>')
+    if sect_pos > b_start:
+        body_end = sect_pos
+    elif body_end_idx > b_start:
+        body_end = body_end_idx
+    else:
+        body_end = len(doc)
+
     body = doc[b_start:body_end]
     boxed = False
 
@@ -457,7 +477,7 @@ def convert_ijraa(analysed: Dict[str, Any], template_dir: str, box_values: Dict[
 class NotaryAppV2(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("مكتب الأستاذ بوخاري مريم — إجراء إشهار عقاري (إصدار V2)")
+        self.title("مكتب الأستاذة حاجي آسيا — موثقة — إجراء إشهار عقاري (V2)")
         self.geometry("860x720")
         self.minsize(740, 620)
         self.configure(bg="#f3f4f6")
@@ -494,11 +514,11 @@ class NotaryAppV2(tk.Tk):
         seal_canvas.pack(side='right', padx=(14, 0))
         seal_canvas.create_oval(3, 3, 47, 47, outline='#eef1f7', width=1.5)
         seal_canvas.create_oval(7, 7, 43, 43, outline='#eef1f7', width=0.8)
-        seal_canvas.create_text(25, 26, text="ب.م", fill='#eef1f7', font=('Traditional Arabic', 14, 'bold'))
+        seal_canvas.create_text(25, 26, text="ح.آ", fill='#eef1f7', font=('Traditional Arabic', 14, 'bold'))
 
         title_box = tk.Frame(header_container, bg=self.c_band)
         title_box.pack(side='right', anchor='center')
-        lbl_title = tk.Label(title_box, text="مكتب الأستاذ بوخاري مريم — موثق", bg=self.c_band, fg="#ffffff", font=('Segoe UI', 13, 'bold'))
+        lbl_title = tk.Label(title_box, text="مكتب الأستاذة حاجي آسيا — موثقة", bg=self.c_band, fg="#ffffff", font=('Segoe UI', 13, 'bold'))
         lbl_title.pack(anchor='e')
         lbl_sub = tk.Label(title_box, text="أداة تحضير العقود الرسمية: «إجراء إشهار عقاري» (V2)", bg=self.c_band, fg="#a9b3c7", font=('Segoe UI', 9))
         lbl_sub.pack(anchor='e')
@@ -618,21 +638,35 @@ class NotaryAppV2(tk.Tk):
     def browse_file(self):
         file_path = filedialog.askopenfilename(
             title="اختيار ملف العقد Word",
-            filetypes=[("Word Documents (*.docx;*.doc)", "*.docx;*.doc"), ("Word (.docx)", "*.docx"), ("Old Word (.doc)", "*.doc")]
+            filetypes=[
+                ("ملفات Word (*.docx;*.doc)", "*.docx;*.doc"),
+                ("مستند Word (.docx)", "*.docx"),
+                ("مستند Word قديم (.doc)", "*.doc"),
+                ("كافة الملفات (*.*)", "*.*")
+            ]
         )
         if not file_path:
             return
 
         try:
-            raw_bytes = None
+            if not os.path.exists(file_path):
+                messagebox.showerror("خطأ", f"تعذر العثور على الملف المحدد:\n{file_path}")
+                return
+
             if file_path.lower().endswith('.doc'):
-                # Handle old .doc file if needed
-                messagebox.showinfo("ملاحظة ملف .doc", "لقراءة ملفات .doc القديمة بأمان، يفضل حفظها كـ .docx عبر Word أو التحويل عبر الموقع.")
+                messagebox.showinfo(
+                    "ملف .doc قديم",
+                    "هذا ملف Word قديم (.doc).\nلقراءته بدقة ومراعاة التنسيق، يرجى فتحه في Word واختيار «حفظ باسم» بصيغة .docx، أو استخدام واجهة المتصفح المخصصة."
+                )
                 return
 
             with open(file_path, 'rb') as fp:
                 raw_bytes = fp.read()
-            
+
+            if not raw_bytes:
+                messagebox.showerror("خطأ", "الملف المختار فارغ (0 بايت).")
+                return
+
             analysed = analyse_docx(raw_bytes)
             self.current_file_path = file_path
             self.analysed_data = analysed
@@ -655,7 +689,9 @@ class NotaryAppV2(tk.Tk):
             self.btn_convert.config(state='normal')
             self.lbl_result.config(text="")
         except Exception as e:
-            messagebox.showerror("خطأ في فحص الملف", f"تعذر فتح وقراءة الملف:\n{str(e)}")
+            import traceback
+            traceback.print_exc()
+            messagebox.showerror("خطأ في فحص الملف", f"تعذر فتح وقراءة ملف Word:\n{str(e)}")
 
     def do_convert(self):
         if not self.analysed_data or not self.current_file_path:

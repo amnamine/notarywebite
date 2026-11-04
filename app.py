@@ -19,7 +19,7 @@ def create_app():
     
     # Configuration
     base_dir = os.path.abspath(os.path.dirname(__file__))
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'notary-boukhari-secret-key-2026')
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'notary-hadji-secret-key-2026')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', f"sqlite:///{os.path.join(base_dir, 'data', 'app.db')}")
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200 MB max upload
@@ -128,7 +128,7 @@ def create_admin_cmd(username, password):
 
 if __name__ == '__main__':
     print("=" * 60)
-    print("  Office of Maitre Boukhari Meriem - Notary")
+    print("  مكتب الأستاذة حاجي آسيا - موثقة")
     print("  Server running at: http://127.0.0.1:5000")
     print("  Default Login: admin / admin123")
     print("=" * 60)

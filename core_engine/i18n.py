@@ -5,8 +5,8 @@ Dictionary of translations for Arabic, French, and English.
 TRANSLATIONS = {
     'ar': {
         # Header & Navigation
-        'office_name': 'مكتب الأستاذ بوخاري مريم',
-        'office_title': 'موثق — الجزائر',
+        'office_name': 'مكتب الأستاذة حاجي آسيا',
+        'office_title': 'موثقة — الجزائر',
         'users': 'المستخدمين',
         'logs': 'سجل العمليات',
         'logout': 'خروج',
@@ -95,7 +95,7 @@ TRANSLATIONS = {
     },
     'fr': {
         # Header & Navigation
-        'office_name': 'Étude Notariale Me Boukhari Meriem',
+        'office_name': 'Étude Notariale Me Hadji Assia',
         'office_title': 'Notaire — Algérie',
         'users': 'Utilisateurs',
         'logs': 'Journal d’activité',
@@ -185,7 +185,7 @@ TRANSLATIONS = {
     },
     'en': {
         # Header & Navigation
-        'office_name': 'Office of Maitre Boukhari Meriem',
+        'office_name': 'Office of Maitre Hadji Assia',
         'office_title': 'Notary — Algeria',
         'users': 'Users',
         'logs': 'Activity Logs',
