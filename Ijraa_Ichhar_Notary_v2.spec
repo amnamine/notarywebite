@@ -9,7 +9,13 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=[
+        'torch', 'torchvision', 'paddle', 'cv2', 'scipy', 'numpy', 'pandas', 'sklearn',
+        'matplotlib', 'seaborn', 'h5py', 'pyarrow', 'xarray', 'netCDF4', 'llvmlite',
+        'numba', 'faiss', 'faiss_cpu', 'pygame', 'IPython', 'pytest', 'grpc', 'botocore',
+        'boto3', 'setuptools', 'pip', 'distutils', 'pkg_resources', 'pydantic',
+        'docx', 'lxml', 'PIL', 'Pillow', 'fitz', 'pymupdf'
+    ],
     noarchive=False,
     optimize=0,
 )

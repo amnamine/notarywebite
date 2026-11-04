@@ -7,6 +7,8 @@ import os
 import io
 import re
 import json
+import struct
+import tempfile
 import subprocess
 import zipfile
 import tkinter as tk
@@ -27,6 +29,183 @@ if not os.path.exists(TEMPLATES_DIR):
     alt_tpl = os.path.join(os.path.dirname(BASE_DIR), 'docx_templates', 'ijraa_ichhar_template')
     if os.path.exists(alt_tpl):
         TEMPLATES_DIR = alt_tpl
+
+# ----------------- DOC CONVERSION HELPER -----------------
+def convert_doc_to_docx_bytes(file_path: str) -> bytes:
+    """
+    Reads a legacy binary Word (.doc / OLE2) file and returns standard .docx bytes.
+    Method 1: Uses win32com (MS Word COM automation) if installed for exact fidelity.
+    Method 2: Falls back to pure-Python OLE2 / WordDocument stream parser and creates a .docx.
+    """
+    # 1. Try win32com if Word is installed on Windows
+    try:
+        import win32com.client
+        import pythoncom
+        pythoncom.CoInitialize()
+        word = win32com.client.DispatchEx('Word.Application')
+        word.Visible = False
+        word.DisplayAlerts = 0
+        abs_doc = os.path.abspath(file_path)
+        with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as tmp:
+            tmp_docx = tmp.name
+        try:
+            doc_obj = word.Documents.Open(abs_doc, ReadOnly=True, ConfirmConversions=False)
+            doc_obj.SaveAs2(tmp_docx, FileFormat=16)  # wdFormatXMLDocument = 16
+            doc_obj.Close(False)
+            with open(tmp_docx, 'rb') as f:
+                data = f.read()
+            if data:
+                return data
+        finally:
+            try:
+                word.Quit()
+            except Exception:
+                pass
+            pythoncom.CoUninitialize()
+            if os.path.exists(tmp_docx):
+                try:
+                    os.remove(tmp_docx)
+                except Exception:
+                    pass
+    except Exception:
+        pass
+
+    # 2. Pure Python CFB / OLE2 fallback
+    with open(file_path, 'rb') as f:
+        data = f.read()
+
+    if len(data) < 512 or data[:8] != b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1':
+        raise ValueError("الملف المحدد ليس ملف OLE2 / .doc صالحاً.")
+
+    sector_size = 1 << struct.unpack_from('<H', data, 30)[0]
+    dir_start_sector = struct.unpack_from('<I', data, 48)[0]
+
+    difat = []
+    for i in range(109):
+        sec = struct.unpack_from('<I', data, 76 + i * 4)[0]
+        if sec in (0xFFFFFFFD, 0xFFFFFFFF):
+            break
+        difat.append(sec)
+
+    fat = []
+    for sec in difat:
+        offset = 512 + sec * sector_size
+        entries_count = sector_size // 4
+        fat.extend(struct.unpack_from(f'<{entries_count}I', data, offset))
+
+    def get_stream(start_sec: int, size: int) -> bytes:
+        cur = start_sec
+        chunks = []
+        bytes_left = size
+        while cur not in (0xFFFFFFFE, 0xFFFFFFFF) and cur < len(fat) and bytes_left > 0:
+            offset = 512 + cur * sector_size
+            take = min(sector_size, bytes_left)
+            chunks.append(data[offset:offset+take])
+            bytes_left -= take
+            cur = fat[cur]
+        return b''.join(chunks)
+
+    dir_stream = get_stream(dir_start_sector, len(fat) * sector_size)
+    entries = {}
+    for i in range(0, len(dir_stream), 128):
+        entry_raw = dir_stream[i:i+128]
+        if len(entry_raw) < 128:
+            break
+        name_len = struct.unpack_from('<H', entry_raw, 64)[0]
+        if name_len == 0:
+            continue
+        name = entry_raw[:name_len-2].decode('utf-16le', errors='ignore')
+        sec_start = struct.unpack_from('<I', entry_raw, 116)[0]
+        stream_size = struct.unpack_from('<Q', entry_raw, 120)[0]
+        entries[name] = (sec_start, stream_size)
+
+    if 'WordDocument' not in entries:
+        raise ValueError("ملف .doc غير متوافق: لم يتم العثور على دفق WordDocument.")
+
+    word_sec, word_sz = entries['WordDocument']
+    word_stream = get_stream(word_sec, word_sz)
+
+    flags = struct.unpack_from('<H', word_stream, 0x000A)[0]
+    table_name = '1Table' if (flags & 0x0200) else '0Table'
+    if table_name not in entries:
+        raise ValueError(f"دفق الجدول {table_name} مفقود في ملف .doc.")
+
+    tbl_sec, tbl_sz = entries[table_name]
+    table_stream = get_stream(tbl_sec, tbl_sz)
+
+    fc_clx = struct.unpack_from('<I', word_stream, 0x01A2)[0]
+    lcb_clx = struct.unpack_from('<I', word_stream, 0x01A6)[0]
+
+    clx_data = table_stream[fc_clx:fc_clx + lcb_clx]
+    pos = 0
+    pcdt = b''
+    lcb_pcdt = 0
+    while pos < len(clx_data):
+        clxt = clx_data[pos]
+        pos += 1
+        if clxt == 1:
+            cb_grpprl = struct.unpack_from('<H', clx_data, pos)[0]
+            pos += 2 + cb_grpprl
+        elif clxt == 2:
+            lcb_pcdt = struct.unpack_from('<I', clx_data, pos)[0]
+            pos += 4
+            pcdt = clx_data[pos:pos+lcb_pcdt]
+            break
+        else:
+            break
+
+    piece_count = (lcb_pcdt - 4) // 12
+    cp_list = [struct.unpack_from('<I', pcdt, i * 4)[0] for i in range(piece_count + 1)]
+    pcd_offset = (piece_count + 1) * 4
+
+    doc_text_parts = []
+    for i in range(piece_count):
+        fc_val = struct.unpack_from('<I', pcdt, pcd_offset + i * 8 + 2)[0]
+        is_compressed = bool(fc_val & 0x40000000)
+        actual_fc = (fc_val & ~0x40000000)
+        length_chars = cp_list[i+1] - cp_list[i]
+        if is_compressed:
+            raw_chars = word_stream[actual_fc // 2 : (actual_fc // 2) + length_chars]
+            doc_text_parts.append(raw_chars.decode('cp1256', errors='replace'))
+        else:
+            raw_chars = word_stream[actual_fc : actual_fc + (length_chars * 2)]
+            doc_text_parts.append(raw_chars.decode('utf-16le', errors='replace'))
+
+    full_text = ''.join(doc_text_parts)
+    full_text = full_text.replace('\r\n', '\n').replace('\r', '\n').replace('\x07', '\n').replace('\x0c', '\n')
+    paras = [p.strip() for p in full_text.split('\n') if p.strip()]
+
+    # Build a clean minimal docx package in memory (pure standard library)
+    content_types = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+        '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+        '<Default Extension="xml" ContentType="application/xml"/>'
+        '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+        '</Types>'
+    )
+    rels = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>'
+        '</Relationships>'
+    )
+    p_xmls = []
+    for p in paras:
+        esc = esc_xml(p)
+        p_xmls.append(f'<w:p><w:r><w:t xml:space="preserve">{esc}</w:t></w:r></w:p>')
+    body = ''.join(p_xmls)
+    doc_xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        f'<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>{body}</w:body></w:document>'
+    )
+
+    bio = io.BytesIO()
+    with zipfile.ZipFile(bio, 'w', zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr('[Content_Types].xml', content_types)
+        zf.writestr('_rels/.rels', rels)
+        zf.writestr('word/document.xml', doc_xml)
+    return bio.getvalue()
 
 # ----------------- XML & DOCX CORE -----------------
 FONT = 'Arial'
@@ -654,14 +833,12 @@ class NotaryAppV2(tk.Tk):
                 return
 
             if file_path.lower().endswith('.doc'):
-                messagebox.showinfo(
-                    "ملف .doc قديم",
-                    "هذا ملف Word قديم (.doc).\nلقراءته بدقة ومراعاة التنسيق، يرجى فتحه في Word واختيار «حفظ باسم» بصيغة .docx، أو استخدام واجهة المتصفح المخصصة."
-                )
-                return
-
-            with open(file_path, 'rb') as fp:
-                raw_bytes = fp.read()
+                self.lbl_file.config(text="جاري معالجة وتجهيز ملف .doc القديم...", fg=self.c_muted)
+                self.update_idletasks()
+                raw_bytes = convert_doc_to_docx_bytes(file_path)
+            else:
+                with open(file_path, 'rb') as fp:
+                    raw_bytes = fp.read()
 
             if not raw_bytes:
                 messagebox.showerror("خطأ", "الملف المختار فارغ (0 بايت).")
